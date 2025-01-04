@@ -1,6 +1,6 @@
 import React from "react";
-import NavBar from "../_components/navbar/NavBar";
-import Footer from "../_components/Footer";
+import NavBar from "../_components/layout/NavBar";
+import Footer from "../_components/layout/Footer";
 
 export default function RootLayout({
   children,

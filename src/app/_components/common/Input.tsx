@@ -1,8 +1,6 @@
 "use client";
 import { Input as InputNextUI } from "@nextui-org/react";
-import { Mail } from "lucide-react";
-import { useState } from "react";
-//thuan
+
 export default function Input({
   placeholder,
   label,
