@@ -26,9 +26,10 @@ export default function NavBar() {
       href: "/about",
     },
   ];
+
   return (
     <>
-      <nav className="bg-white h-auto shadow-lg">
+      <nav className="bg-white h-auto shadow-lg fixed top-0 left-0 right-0 z-50">
         <div className="mx-auto px-4">
           <div className="flex w-[95%] mx-auto justify-around items-center h-20">
             <div className="w-40">
@@ -50,15 +51,19 @@ export default function NavBar() {
                   key={index}
                   className={`${
                     pathname === item.href ? "text-blue-500" : "text-gray-500"
-                  } hover:text-blue-500 transition-colors duration-300 text-lg`}>
+                  } hover:text-blue-500 transition-colors duration-300 text-lg`}
+                >
                   {item.name}
                 </Link>
               ))}
             </div>
             <div>
-              <button className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg">
+              <Link
+                href="/login"
+                className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg"
+              >
                 Đăng nhập
-              </button>
+              </Link>
             </div>
           </div>
         </div>
