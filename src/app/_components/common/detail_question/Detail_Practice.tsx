@@ -4,7 +4,14 @@ import Number from "./Number";
 import { Radio, RadioGroup } from "@nextui-org/react";
 import Time from "./Time";
 
-export default function Detail_Practice({ params }: { params: any }) {
+// Định nghĩa interface cho props
+interface DetailPracticeProps {
+  params: {
+    slug?: string[];
+  };
+}
+
+export default function Detail_Practice({ params }: DetailPracticeProps) {
   const [question, setQuestion] = useState(1);
   const [time, setTime] = useState(2000);
   const [selectedAnswers, setSelectedAnswers] = useState<{
