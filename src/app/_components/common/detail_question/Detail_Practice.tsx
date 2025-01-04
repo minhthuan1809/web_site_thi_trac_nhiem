@@ -7,7 +7,7 @@ import Time from "./Time";
 // Định nghĩa interface cho props
 interface DetailPracticeProps {
   params: {
-    slug?: string[];
+    slug: string[];
   };
 }
 
