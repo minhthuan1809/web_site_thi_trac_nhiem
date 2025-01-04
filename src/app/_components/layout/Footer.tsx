@@ -3,7 +3,7 @@ import React from "react";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gray-900 text-white">
+    <footer className="relative bg-gray-900 text-white mt-16">
       {/* Top decorative line */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
 

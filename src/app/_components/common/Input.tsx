@@ -1,6 +1,7 @@
 "use client";
 import { Input as InputNextUI } from "@nextui-org/react";
 import Icon from "./Icon";
+import { useState } from "react";
 
 interface InputProps {
   placeholder: string;
@@ -19,7 +20,9 @@ export default function Input({
   type,
   icon,
 }: InputProps) {
-  console.log(icon);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
     <div className="w-full">
@@ -28,7 +31,18 @@ export default function Input({
           inputWrapper: "w-full mt-[1rem]",
         }}
         startContent={icon && <Icon icon={icon} className="text-gray-400" />}
-        type={type}
+        endContent={
+          type === "password" && (
+            <button className="focus:outline-none" onClick={toggleVisibility}>
+              {isVisible ? (
+                <Icon icon="EyeIcon" className="text-gray-400" />
+              ) : (
+                <Icon icon="EyeOffIcon" className="text-gray-400" />
+              )}
+            </button>
+          )
+        }
+        type={type === "password" ? (isVisible ? "text" : "password") : type}
         label={label}
         labelPlacement={"outside"}
         maxLength={30}

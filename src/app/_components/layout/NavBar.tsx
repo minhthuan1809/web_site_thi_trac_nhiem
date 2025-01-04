@@ -4,10 +4,10 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Avatar } from "@nextui-org/react";
+import Icon from "../common/Icon";
 
 export default function NavBar() {
   const pathname = usePathname();
-  console.log(pathname);
 
   const dataUrl = [
     {
@@ -15,8 +15,8 @@ export default function NavBar() {
       href: "/",
     },
     {
-      name: "Câu hỏi",
-      href: "/questions",
+      name: "Thi thử",
+      href: "/practice",
     },
     {
       name: "Blog",
@@ -51,7 +51,10 @@ export default function NavBar() {
                   href={item.href}
                   key={index}
                   className={`${
-                    pathname === item.href ? "text-blue-500" : "text-gray-500"
+                    (pathname.includes(item.href) && item.href !== "/") ||
+                    (pathname === "/" && item.href === "/")
+                      ? "text-blue-500"
+                      : "text-gray-500"
                   } hover:text-blue-500 transition-colors duration-300 text-lg`}
                 >
                   {item.name}
@@ -75,20 +78,17 @@ export default function NavBar() {
               {/* Menu dropdown */}
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 invisible group-hover:visible transition-all duration-300 border border-gray-100">
                 <Link
-                  href="/profile"
-                  className="block px-4 py-2 text-gray-800 hover:bg-blue-50"
+                  href="/settings"
+                  className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
                 >
-                  Thông tin cá nhân
+                  <Icon icon="UserIcon" className="w-5 h-5" />
+                  <span className="font-medium">Thông tin cá nhân</span>
                 </Link>
-                <Link
-                  href="/change-password"
-                  className="block px-4 py-2 text-gray-800 hover:bg-blue-50"
-                >
-                  Đổi mật khẩu
-                </Link>
+
                 <div className="border-t border-gray-100 my-1"></div>
-                <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
-                  Đăng xuất
+                <button className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                  <Icon icon="LogOut" className="w-5 h-5" />
+                  <span className="font-medium">Đăng xuất</span>
                 </button>
               </div>
             </div>
