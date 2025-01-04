@@ -8,37 +8,37 @@ const subjects = [
     id: 1,
     name: "Toán học",
     description: "Các đề thi thử môn Toán",
-    image: "/images/subjects/math.png",
+    image: "https://picsum.photos/200",
   },
   {
     id: 2,
     name: "Vật lý",
     description: "Các đề thi thử môn Vật lý",
-    image: "/images/subjects/physics.png",
+    image: "https://picsum.photos/200",
   },
   {
     id: 3,
     name: "Hóa học",
     description: "Các đề thi thử môn Hóa học",
-    image: "/images/subjects/chemistry.png",
+    image: "https://picsum.photos/200",
   },
   {
     id: 4,
     name: "Sinh học",
     description: "Các đề thi thử môn Sinh học",
-    image: "/images/subjects/biology.png",
+    image: "https://picsum.photos/200",
   },
   {
     id: 5,
     name: "Tiếng Anh",
     description: "Các đề thi thử môn Tiếng Anh",
-    image: "/images/subjects/english.png",
+    image: "https://picsum.photos/200",
   },
   {
     id: 6,
     name: "Ngữ văn",
     description: "Các đề thi thử môn Ngữ văn",
-    image: "/images/subjects/literature.png",
+    image: "https://picsum.photos/200",
   },
 ];
 

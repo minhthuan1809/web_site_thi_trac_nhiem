@@ -1,12 +1,12 @@
 "use client";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Change_password from "./Change_password";
 import Profile from "./Profile";
 import Link from "next/link";
 import { LockIcon, UserIcon } from "lucide-react";
 
-export default function PageProfile() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const tag = searchParams.get("tag");
@@ -71,5 +71,13 @@ export default function PageProfile() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PageProfile() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }
