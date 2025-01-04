@@ -1,13 +1,11 @@
 "use client";
 import { useState } from "react";
 import Input from "@/app/_components/common/Input";
-import { Lock, Mail } from "lucide-react";
-import { Button } from "@nextui-org/react";
+import Link from "next/link";
 
 export default function PageLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [forgotPassword, setForgotPassword] = useState(false);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -37,7 +35,7 @@ export default function PageLogin() {
               placeholder="Nhập email của trường"
               value={email}
               onChange={(e) => setEmail(e)}
-              icon={<Mail className="text-gray-400" />}
+              icon={"Mail"}
               label="Email"
             />
             <Input
@@ -46,7 +44,7 @@ export default function PageLogin() {
               label="Mật khẩu"
               onChange={(e) => setPassword(e)}
               type="password"
-              icon={<Lock className="text-gray-400" />}
+              icon={"Lock"}
             />
 
             <div className="flex items-center justify-between">
@@ -64,15 +62,12 @@ export default function PageLogin() {
                 </label>
               </div>
 
-              <Button
-                variant="light"
-                color="primary"
-                disableRipple
+              <Link
+                href="/forgot-password"
                 className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline"
-                onPress={() => setForgotPassword(true)}
               >
                 Quên mật khẩu?
-              </Button>
+              </Link>
             </div>
 
             <div className="space-y-4">

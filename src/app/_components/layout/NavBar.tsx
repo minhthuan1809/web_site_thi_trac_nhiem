@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { Avatar } from "@nextui-org/react";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -57,14 +58,48 @@ export default function NavBar() {
                 </Link>
               ))}
             </div>
-            <div>
+            <div className="relative group">
+              <div className="flex items-center gap-2 cursor-pointer">
+                <div className="border border-blue-600 rounded-full p-1">
+                  <Avatar
+                    src="https://i.pravatar.cc/150?u=a042581f4e29026024d"
+                    size="lg"
+                  />
+                </div>
+                <div>
+                  <p className="font-medium font-semibold">Nguyễn Văn A</p>
+                  <p className="text-gray-500">20210533@eaut.edu.vn</p>
+                </div>
+              </div>
+
+              {/* Menu dropdown */}
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 invisible group-hover:visible transition-all duration-300 border border-gray-100">
+                <Link
+                  href="/profile"
+                  className="block px-4 py-2 text-gray-800 hover:bg-blue-50"
+                >
+                  Thông tin cá nhân
+                </Link>
+                <Link
+                  href="/change-password"
+                  className="block px-4 py-2 text-gray-800 hover:bg-blue-50"
+                >
+                  Đổi mật khẩu
+                </Link>
+                <div className="border-t border-gray-100 my-1"></div>
+                <button className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
+                  Đăng xuất
+                </button>
+              </div>
+            </div>
+            {/* <div>
               <Link
                 href="/login"
                 className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg"
               >
                 Đăng nhập
               </Link>
-            </div>
+            </div> */}
           </div>
         </div>
       </nav>
