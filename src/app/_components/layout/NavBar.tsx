@@ -18,14 +18,6 @@ export default function NavBar() {
       name: "Thi thử",
       href: "/practice",
     },
-    {
-      name: "Blog",
-      href: "/blog",
-    },
-    {
-      name: "Giới thiệu",
-      href: "/about",
-    },
   ];
 
   return (
@@ -84,7 +76,13 @@ export default function NavBar() {
                   <Icon icon="UserIcon" className="w-5 h-5" />
                   <span className="font-medium">Thông tin cá nhân</span>
                 </Link>
-
+                <Link
+                  href="/exam"
+                  className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
+                >
+                  <Icon icon="BookOpenCheck" className="w-5 h-5" />
+                  <span className="font-medium">Bài thi</span>
+                </Link>
                 <div className="border-t border-gray-100 my-1"></div>
                 <button className="flex items-center gap-2 w-full text-left px-4 py-2 text-red-600 hover:bg-red-50">
                   <Icon icon="LogOut" className="w-5 h-5" />
