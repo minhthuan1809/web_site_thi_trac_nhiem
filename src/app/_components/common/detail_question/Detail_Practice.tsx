@@ -12,7 +12,7 @@ interface DetailPracticeProps {
 }
 
 export default function Detail_Practice({ params }: DetailPracticeProps) {
-  const [question, setQuestion] = useState(1);
+  const [numberQuestion, setNumberQuestion] = useState(1);
   const [time, setTime] = useState(2000);
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: string;
@@ -57,11 +57,7 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
     },
   ];
 
-  const currentQuestion = questions[question - 1];
-
-  useEffect(() => {
-    console.log(time);
-  }, [time]);
+  const currentQuestion = questions[numberQuestion - 1];
 
   const handleAnswerChange = (value: string) => {
     console.log(selectedAnswers);
@@ -98,17 +94,21 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
             <div className="flex justify-between mt-8">
               <button
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-                onClick={() => setQuestion(Math.max(1, question - 1))}
-                disabled={question === 1}
+                onClick={() =>
+                  setNumberQuestion(Math.max(1, numberQuestion - 1))
+                }
+                disabled={numberQuestion === 1}
               >
                 Câu trước
               </button>
               <button
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 onClick={() =>
-                  setQuestion(Math.min(questions.length, question + 1))
+                  setNumberQuestion(
+                    Math.min(questions.length, numberQuestion + 1)
+                  )
                 }
-                disabled={question === questions.length}
+                disabled={numberQuestion === questions.length}
               >
                 Câu tiếp theo
               </button>
@@ -123,8 +123,8 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
             {/* số lượng câu hỏi */}
             <Number
               length={questions.length}
-              question={question}
-              setQuestion={setQuestion}
+              question={numberQuestion}
+              setQuestion={setNumberQuestion}
             />
           </div>
         </div>
