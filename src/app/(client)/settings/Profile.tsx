@@ -5,157 +5,124 @@ import Icon from "@/app/_components/common/Icon";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
-    studentId: "20210533",
-    fullName: "Nguyễn Minh Thuận",
-    dateOfBirth: "18/09/2003",
-    gender: "Nam",
-    birthPlace: "Gia Lai",
-    hometown: "Vạn Kim, Mỹ Đức, Hà Nội",
-    nationality: "Việt Nam",
-    ethnicity: "Kinh",
-    religion: "",
-    background: "Nông dân",
-    address: "Làng Le 2, La Lang, Đức Cơ, Gia Lai",
-    ward: "Xã Ia Lang",
-    district: "Đức Cơ",
-    city: "Gia Lai",
-    studentType: "Học sinh phổ thông",
-    subsidyType: "Học sinh phổ thông",
-    homePhone: "0355665985",
-    mobilePhone: "0325397277",
-    email: "20210533@eaut.edu.vn",
-    idNumber: "064203004587",
-    notificationAddress: "Làng Le 2, La Lang, Đức Cơ, Gia Lai",
-    currentAddress: "Làng Le 2, La Lang, Đức Cơ, Gia Lai",
-  });
-
-  const inputFields = [
-    {
-      name: "studentId",
+    studentId: {
+      value: "20210533",
       placeholder: "Nhập mã sinh viên",
       label: "Mã sinh viên",
       icon: "HashIcon",
     },
-    {
-      name: "fullName",
+    fullName: {
+      value: "Nguyễn Minh Thuận",
       placeholder: "Nhập họ và tên",
       label: "Họ và tên",
       icon: "UserIcon",
     },
-    {
-      name: "dateOfBirth",
+    dateOfBirth: {
+      value: "18/09/2003",
       placeholder: "Nhập ngày sinh",
       label: "Ngày sinh",
       icon: "CalendarIcon",
     },
-    {
-      name: "gender",
+    gender: {
+      value: "Nam",
       placeholder: "Nhập giới tính",
       label: "Giới tính",
       icon: "UserIcon",
     },
-    {
-      name: "birthPlace",
+    birthPlace: {
+      value: "Gia Lai",
       placeholder: "Nhập nơi sinh",
       label: "Nơi sinh",
       icon: "MapPinIcon",
     },
-    {
-      name: "hometown",
+    hometown: {
+      value: "Vạn Kim, Mỹ Đức, Hà Nội",
       placeholder: "Nhập quê quán",
       label: "Quê quán",
       icon: "HomeIcon",
     },
-    {
-      name: "nationality",
+    nationality: {
+      value: "Việt Nam",
       placeholder: "Nhập quốc tịch",
       label: "Quốc tịch",
       icon: "FlagIcon",
     },
-    {
-      name: "ethnicity",
+    ethnicity: {
+      value: "Kinh",
       placeholder: "Nhập dân tộc",
       label: "Dân tộc",
       icon: "UsersIcon",
     },
-    {
-      name: "religion",
+    religion: {
+      value: "",
       placeholder: "Nhập tôn giáo",
       label: "Tôn giáo",
       icon: "HeartIcon",
     },
-    {
-      name: "background",
+    background: {
+      value: "Nông dân",
       placeholder: "Nhập thành phần xuất thân",
       label: "Thành phần xuất thân",
       icon: "UserIcon",
     },
-    {
-      name: "address",
+    address: {
+      value: "Làng Le 2, La Lang, Đức Cơ, Gia Lai",
       placeholder: "Nhập địa chỉ",
       label: "Địa chỉ",
       icon: "MapPinIcon",
     },
-    {
-      name: "ward",
-      placeholder: "Nhập phường/xã",
-      label: "Phường/Xã",
-      icon: "MapIcon",
+
+    subsidyType: {
+      value: "Học sinh phổ thông",
+      placeholder: "Nhập loại trợ cấp",
+      label: "Loại trợ cấp",
+      icon: "UserIcon",
     },
-    {
-      name: "district",
-      placeholder: "Nhập quận/huyện",
-      label: "Quận/Huyện",
-      icon: "MapIcon",
-    },
-    {
-      name: "city",
-      placeholder: "Nhập tỉnh/thành phố",
-      label: "Tỉnh/Thành phố",
-      icon: "MapIcon",
-    },
-    {
-      name: "homePhone",
+    homePhone: {
+      value: "0355665985",
       placeholder: "Nhập điện thoại nhà riêng",
       label: "Điện thoại nhà riêng",
       icon: "PhoneIcon",
     },
-    {
-      name: "mobilePhone",
+    mobilePhone: {
+      value: "0325397277",
       placeholder: "Nhập điện thoại di động",
       label: "Điện thoại di động",
       icon: "SmartphoneIcon",
     },
-    {
-      name: "email",
+    email: {
+      value: "20210533@eaut.edu.vn",
       placeholder: "Nhập email",
       label: "Email",
       icon: "MailIcon",
     },
-    {
-      name: "idNumber",
-      placeholder: "Nhập số CMND/CCCD",
-      label: "Số CMND/CCCD",
-      icon: "CreditCardIcon",
+    class: {
+      value: "DCCNTT12.10.2",
+      placeholder: "Nhập lớp",
+      label: "Lớp",
+      icon: "School",
     },
-    {
-      name: "notificationAddress",
-      placeholder: "Nhập địa chỉ báo tin",
-      label: "Địa chỉ báo tin",
-      icon: "MapPinIcon",
+    major: {
+      value: "Công nghệ thông tin",
+      placeholder: "Nhập ngành học",
+      label: "Ngành học",
+      icon: "School",
     },
-    {
-      name: "currentAddress",
-      placeholder: "Nhập nơi ở hiện nay",
-      label: "Nơi ở hiện nay",
-      icon: "HomeIcon",
+    interlock: {
+      value: "K12",
+      placeholder: "Nhập khóa",
+      label: "Khóa",
+      icon: "School",
     },
-  ];
+  });
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: {
+        ...prev[name as keyof typeof formData],
+        value,
+      },
     }));
   };
 
@@ -175,12 +142,12 @@ export default function Profile() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-        {inputFields.map((field, index) => (
+        {Object.entries(formData).map(([name, field], index) => (
           <Input
             key={index}
             placeholder={field.placeholder}
-            value={formData[field.name as keyof typeof formData]}
-            onChange={(value) => handleChange(field.name, value)}
+            value={field.value}
+            onChange={(value) => handleChange(name, value)}
             label={field.label}
             icon={field.icon}
           />
