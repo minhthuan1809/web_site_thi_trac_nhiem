@@ -9,9 +9,13 @@ const nextConfig: NextConfig = {
         hostname: "eaut.edu.vn",
       },
       {
-        protocol: "https",
-        hostname: "picsum.photos",
-      },
+          protocol: "https",
+          hostname: "picsum.photos",
+        },
+        {
+          protocol: "https",
+          hostname: "louisville.edu",
+        },
     ],
   },
 };
