@@ -36,20 +36,21 @@ export default function layout({ children }: { children: React.ReactNode }) {
         {
           name: "Logo",
           icon: "House",
-          href: "/admin/logo",
+          href: "/admin/layout?page=logo",
         },
         {
           name: "Chân Trang",
           icon: "Footprints",
-          href: "/admin/footer",
+          href: "/admin/layout?page=footer",
         },
         {
           name: "Menu",
           icon: "MenuIcon",
-          href: "/admin/menu",
+          href: "/admin/layout?page=menu",
         },
       ],
     },
+    
   ];
   return (
     <div className="flex h-screen">
