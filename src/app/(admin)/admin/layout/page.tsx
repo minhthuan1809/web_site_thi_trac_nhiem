@@ -1,15 +1,25 @@
 "use client"
-    import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import EditFooter from './EditFooter'
+import { Suspense } from 'react'
 
-export default function page() {
-    const searchParams = useSearchParams()  
-    const page = searchParams.get("page")
-    console.log("page", page)
+function LayoutContent() {
+  const searchParams = useSearchParams()
+  const page = searchParams.get("page")
+  console.log("page", page)
+  
   return (
     <div>
-        {page === "footer" && <EditFooter/>  }
+      {page === "footer" && <EditFooter/>  }
     </div>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LayoutContent />
+    </Suspense>
   )
 }
 
