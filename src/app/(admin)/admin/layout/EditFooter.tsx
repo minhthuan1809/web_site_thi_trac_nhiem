@@ -1,5 +1,6 @@
 "use client";
 import Input from "@/app/_components/common/Input";
+import IconSelect from "@/app/_components/ui/SelectIcon";
 import { Button } from "@nextui-org/react";
 import React, { useState } from "react";
 
@@ -12,7 +13,7 @@ export default function EditFooter() {
   const [link, setLink] = useState("");
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       {/* //Cập nhật thông tin chân trang */}
       <div className="shadow-lg p-4 border rounded-2xl w-4/5 m-auto bg-white p-10">
         <h1 className="text-3xl font-bold">Cập nhật thông tin chân trang</h1>
@@ -36,18 +37,11 @@ export default function EditFooter() {
         />
         <Button className="bg-blue-500 text-white mt-4">Cập nhật</Button>
       </div>
-
       {/* //Cập nhật thông tin Mạng Xã Hội */}
       <div className="shadow-lg p-4 border rounded-2xl w-4/5 m-auto bg-white">
         <h1 className="text-3xl font-bold">Thông tin Mạng Xã Hội</h1>
         <div className="flex gap-4">
-          {" "}
-          <Input
-            placeholder="Email"
-            value={icon}
-            onChange={setIcon}
-            label="icon"
-          />
+        <IconSelect />
           <Input
             placeholder="Link"
             value={link}
