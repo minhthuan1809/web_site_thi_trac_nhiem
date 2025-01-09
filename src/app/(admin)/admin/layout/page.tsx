@@ -2,6 +2,7 @@
 import { useSearchParams } from 'next/navigation'
 import EditFooter from './EditFooter'
 import { Suspense } from 'react'
+import EditNavBar from './EditNavBar'
 
 function LayoutContent() {
   const searchParams = useSearchParams()
@@ -11,6 +12,7 @@ function LayoutContent() {
   return (
     <div>
       {page === "footer" && <EditFooter/>  }
+      {page === "navbar" && <EditNavBar/>}
     </div>
   )
 }

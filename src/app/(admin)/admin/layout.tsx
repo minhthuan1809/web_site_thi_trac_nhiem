@@ -34,7 +34,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
       href: "/admin/LayoutDashboard",
       data: [
         {
-          name: "Logo",
+          name: "Nav",
           icon: "House",
           href: "/admin/layout?page=logo",
         },
@@ -46,7 +46,7 @@ export default function layout({ children }: { children: React.ReactNode }) {
         {
           name: "Menu",
           icon: "MenuIcon",
-          href: "/admin/layout?page=menu",
+          href: "/admin/layout?page=navbar",
         },
       ],
     },
