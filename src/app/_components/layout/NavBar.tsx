@@ -1,14 +1,16 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Avatar } from "@nextui-org/react";
 import Icon from "../common/Icon";
+import { getLogo, getNavItems } from "@/app/service/Navbar_api";
 
 export default function NavBar() {
   const pathname = usePathname();
-
+  const [logo, setLogo] = useState("");
+  const [items, setItems] = useState<any[]>([]);
   const dataUrl = [
     {
       name: "Trang chủ",
@@ -20,15 +22,27 @@ export default function NavBar() {
     },
   ];
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getLogo();
+      const dataNavItems = await getNavItems();
+
+      setItems(dataNavItems.data.nav.navbar_items);
+      setLogo(data.data.nav.logo.url);
+      console.log("dataNavItems", items);
+    };
+    fetchData();
+  }, []);
+
   return (
     <>
       <nav className="bg-white h-auto shadow-lg fixed top-0 left-0 right-0 z-50">
         <div className="mx-auto px-4">
           <div className="flex w-[95%] mx-auto justify-around items-center h-20">
-            <div className="w-40">
+            <div className="w-40 overflow-hidden h-[60%] rounded-md">
               <Link href="/" className="w-full h-full">
                 <Image
-                  src="https://eaut.edu.vn/wp-content/uploads/2018/11/logo-1.png"
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
                   alt="logo"
                   width={150}
                   height={150}
