@@ -1,10 +1,7 @@
-<<<<<<< HEAD
-import React from "react";
-=======
-const iconNames = [
+const dataicon = [
   "AArrowDown",
   "AArrowDownIcon",
-  "AArrowUp",
+  "AArrowUp", 
   "AArrowUpIcon",
   "ALargeSmall",
   "ALargeSmallIcon",
@@ -896,47 +893,5 @@ const iconNames = [
   "Clock11Icon",
   "Clock12",
   "Clock12Icon",
-];
->>>>>>> d78a6b3feb5615ca1ebcb28d3bb8af8cc6b84d0c
 
-import React from "react";
-import Icon from "../common/Icon";
-import { Select, SelectItem } from "@nextui-org/react";
-
-export default function SelectIcon({ onChange }: { onChange?: (value: string) => void }) {
-  return (
-<<<<<<< HEAD
-    <div>
-      <select name="" id="">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-      </select>
-=======
-    <div className="flex w-full flex-wrap md:flex-nowrap gap-4">
-      <Select
-        className="w-full max-w-xs"
-        label="Select Icon" 
-        placeholder="Choose an icon..."
-        labelPlacement="outside"
-        classNames={{
-          trigger: "h-10",
-          value: "text-sm",
-          label: "text-sm font-medium",
-        }}
-      >
-
-
-        {iconNames?.map((iconName) => (
-          <SelectItem key={iconName} value={iconName}>
-            <div className="flex items-center gap-3">
-              <Icon icon={iconName} className="w-5 h-5 text-gray-600" />
-              <span className="text-sm">{iconName}</span>
-            </div>
-          </SelectItem>
-        ))}
-      </Select>
->>>>>>> d78a6b3feb5615ca1ebcb28d3bb8af8cc6b84d0c
-    </div>
-  );
-}
+]

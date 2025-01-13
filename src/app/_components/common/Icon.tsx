@@ -8,5 +8,7 @@ interface IconProps {
 
 export default function Icon({ icon, className }: IconProps) {
   const IconComponent = icon ? (LucideIcons as any)[icon] : null;
-  return IconComponent ? <IconComponent className={className} /> : null;
+  return IconComponent ? (
+    <IconComponent className={className} size={20} />
+  ) : null;
 }
