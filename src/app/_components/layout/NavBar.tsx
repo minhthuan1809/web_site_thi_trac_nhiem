@@ -5,34 +5,29 @@ import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { Avatar } from "@nextui-org/react";
 import Icon from "../common/Icon";
-import { getLogo, getNavItems } from "@/app/service/Navbar_api";
+import { getLogo, getNavBtn, getNavItems } from "@/app/service/Navbar_api";
 
 export default function NavBar() {
   const pathname = usePathname();
   const [logo, setLogo] = useState("");
   const [items, setItems] = useState<any[]>([]);
-  const dataUrl = [
-    {
-      name: "Trang chủ",
-      href: "/",
-    },
-    {
-      name: "Thi thử",
-      href: "/practice",
-    },
-  ];
+  const [btnNav, setBtnNav] = useState<any[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
+      
       const data = await getLogo();
       const dataNavItems = await getNavItems();
+      const dataNavBtn = await getNavBtn();
 
-      setItems(dataNavItems.data.nav.navbar_items);
-      setLogo(data.data.nav.logo.url);
-      console.log("dataNavItems", items);
+
+      setLogo(data.data.navbar.logo.url);
+      setItems(dataNavItems.data.navbar.items);
+      setBtnNav(dataNavBtn.data.navbar.btn_nav);
     };
     fetchData();
-  }, []);
+  }, [logo]);
 
   return (
     <>
@@ -52,18 +47,19 @@ export default function NavBar() {
               </Link>
             </div>
             <div className="flex gap-8">
-              {dataUrl.map((item, index) => (
+              {items.map((item, index) => (
                 <Link
-                  href={item.href}
+                  href={item.url}
                   key={index}
+                  target={item.target}
                   className={`${
-                    (pathname.includes(item.href) && item.href !== "/") ||
-                    (pathname === "/" && item.href === "/")
+                    (pathname.includes(item.url) && item.url !== "/") ||
+                    (pathname === "/" && item.url === "/")
                       ? "text-blue-500"
                       : "text-gray-500"
                   } hover:text-blue-500 transition-colors duration-300 text-lg`}
                 >
-                  {item.name}
+                  {item.title}
                 </Link>
               ))}
             </div>
@@ -81,7 +77,6 @@ export default function NavBar() {
                 </div>
               </div>
 
-              {/* Menu dropdown */}
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 invisible group-hover:visible transition-all duration-300 border border-gray-100">
                 <Link
                   href="/settings"
@@ -104,13 +99,18 @@ export default function NavBar() {
                 </button>
               </div>
             </div>
-            {/* <div>
+            {/* btn login */}
+            {/* <div className="flex gap-4">
+             {btnNav.map((item, index) => (
               <Link
-                href="/login"
+                href={item.url}
+                key={index}
+                target={item.target}
                 className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg"
               >
-                Đăng nhập
+                {item.title}
               </Link>
+             ))}
             </div> */}
           </div>
         </div>
