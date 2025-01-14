@@ -3,21 +3,14 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardHeader, CardBody, user } from "@nextui-org/react";
-import {
-  BookOpen,
-  CheckCircle2,
-  Globe,
-  Users,
-  BookCheck,
-  GraduationCap,
-  Star,
-} from "lucide-react";
+
 import {
   getHomeSectionFeature,
   getHomeSectionHero,
   getHomeSectionStatistics,
 } from "../service/home_api";
 import Icon from "../_components/common/Icon";
+import Loading from "../_components/common/Loading";
 
 const Introduction = () => {
   const [dataHeroSection, setDataHeroSection] = useState<any>(null);
@@ -36,13 +29,12 @@ const Introduction = () => {
       // get statistics section
       const dataStatistics = await getHomeSectionStatistics();
       setDataStatisticsSection(dataStatistics.data.statistics_section);
-      console.log(dataStatistics.data.statistics_section);
     };
 
     fetchData();
   }, []);
   if (!dataHeroSection || !dataFeatureSection || !dataStatisticsSection)
-    return null;
+    return <Loading />;
   return (
     <div className="min-h-screen bg-white mt-[5rem]">
       {/* Hero Section */}
@@ -96,7 +88,7 @@ const Introduction = () => {
         >
           {dataFeatureSection?.header}
         </motion.h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3  gap-8">
           {dataFeatureSection.section_items.map((feature: any, index: any) => (
             <motion.div
               key={index}
