@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Card, CardHeader, CardBody } from "@nextui-org/react";
+import { Card, CardHeader, CardBody, user } from "@nextui-org/react";
 import {
   BookOpen,
   CheckCircle2,
@@ -12,8 +12,37 @@ import {
   GraduationCap,
   Star,
 } from "lucide-react";
+import {
+  getHomeSectionFeature,
+  getHomeSectionHero,
+  getHomeSectionStatistics,
+} from "../service/home_api";
+import Icon from "../_components/common/Icon";
 
 const Introduction = () => {
+  const [dataHeroSection, setDataHeroSection] = useState<any>(null);
+  const [dataFeatureSection, setDataFeatureSection] = useState<any>(null);
+  const [dataStatisticsSection, setDataStatisticsSection] = useState<any>(null);
+  useEffect(() => {
+    const fetchData = async () => {
+      // get hero section
+      const data = await getHomeSectionHero();
+      setDataHeroSection(data.data.hero_section);
+
+      // get features section
+      const dataFeature = await getHomeSectionFeature();
+      setDataFeatureSection(dataFeature.data.features_section);
+
+      // get statistics section
+      const dataStatistics = await getHomeSectionStatistics();
+      setDataStatisticsSection(dataStatistics.data.statistics_section);
+      console.log(dataStatistics.data.statistics_section);
+    };
+
+    fetchData();
+  }, []);
+  if (!dataHeroSection || !dataFeatureSection || !dataStatisticsSection)
+    return null;
   return (
     <div className="min-h-screen bg-white mt-[5rem]">
       {/* Hero Section */}
@@ -31,7 +60,10 @@ const Introduction = () => {
               transition={{ duration: 0.5 }}
               className="flex justify-center mb-6"
             >
-              <GraduationCap className="w-16 h-16 md:w-20 md:h-20" />
+              <Icon
+                icon={dataHeroSection?.icon}
+                className="w-16 h-16 md:w-20 md:h-20"
+              />
             </motion.div>
             <motion.h1
               initial={{ y: 20, opacity: 0 }}
@@ -39,7 +71,7 @@ const Introduction = () => {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6"
             >
-              Hệ Thống Thi Trắc Nghiệm Online
+              {dataHeroSection?.header}
             </motion.h1>
             <motion.p
               initial={{ y: 20, opacity: 0 }}
@@ -47,7 +79,7 @@ const Introduction = () => {
               transition={{ delay: 0.6, duration: 0.6 }}
               className="text-lg md:text-xl lg:text-2xl"
             >
-              Nền tảng học tập và kiểm tra kiến thức hiện đại
+              {dataHeroSection?.content}
             </motion.p>
           </div>
         </div>
@@ -62,50 +94,32 @@ const Introduction = () => {
           transition={{ duration: 0.6 }}
           className="text-3xl font-bold text-center mb-16"
         >
-          Tính năng nổi bật
+          {dataFeatureSection?.header}
         </motion.h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            {
-              icon: <BookOpen className="w-8 h-8" />,
-              title: "Đa dạng bài thi",
-              description:
-                "Hệ thống cung cấp nhiều dạng bài thi đa dạng từ các môn học cơ bản đến chuyên ngành.",
-            },
-            {
-              icon: <CheckCircle2 className="w-8 h-8" />,
-              title: "Chấm điểm tự động",
-              description:
-                "Kết quả và phân tích chi tiết được cung cấp ngay sau khi hoàn thành bài thi.",
-            },
-            {
-              icon: <Globe className="w-8 h-8" />,
-              title: "Học mọi lúc mọi nơi",
-              description:
-                "Truy cập và làm bài thi mọi lúc mọi nơi trên các thiết bị khác nhau.",
-            },
-          ].map((feature, index) => (
+          {dataFeatureSection.section_items.map((feature: any, index: any) => (
             <motion.div
               key={index}
               initial={{ y: 50, opacity: 0 }}
               whileInView={{ y: 0, opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.2, duration: 0.5 }}
+              className="w-full h-[14rem]"
             >
-              <Card className="shadow-lg">
+              <Card className="shadow-lg h-full">
                 <CardHeader className="pb-2 pt-6 px-6">
                   <div className="flex flex-col gap-2">
                     <motion.div
                       whileHover={{ scale: 1.1 }}
                       className="text-blue-600"
                     >
-                      {feature.icon}
+                      <Icon icon={feature.icon} size={40} />
                     </motion.div>
                     <h4 className="text-xl font-bold">{feature.title}</h4>
                   </div>
                 </CardHeader>
                 <CardBody className="pb-6 px-6">
-                  <p className="text-gray-600">{feature.description}</p>
+                  <p className="text-gray-600 text-md">{feature.description}</p>
                 </CardBody>
               </Card>
             </motion.div>
@@ -117,12 +131,7 @@ const Introduction = () => {
       <div className="bg-gray-50 py-24">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: <Users />, value: "1000+", label: "Học viên" },
-              { icon: <BookCheck />, value: "500+", label: "Bài thi" },
-              { icon: <GraduationCap />, value: "50+", label: "Giáo viên" },
-              { icon: <Star />, value: "4.8", label: "Đánh giá trung bình" },
-            ].map((stat, index) => (
+            {dataStatisticsSection.map((stat: any, index: any) => (
               <motion.div
                 key={index}
                 initial={{ scale: 0 }}
@@ -135,7 +144,7 @@ const Introduction = () => {
                   whileHover={{ scale: 1.1 }}
                   className="flex justify-center mb-4 text-blue-600"
                 >
-                  {React.cloneElement(stat.icon, { size: 32 })}
+                  <Icon icon={stat.icon} size={40} />
                 </motion.div>
                 <motion.h3
                   initial={{ opacity: 0 }}
