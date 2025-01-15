@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
@@ -11,63 +11,47 @@ import {
   Pagination,
 } from "@nextui-org/react";
 import { SearchIcon } from "lucide-react";
-// minh thuận
-const subjects = [
-  {
-    id: 1,
-    name: "Giải tích",
-    description: "Đề thi và bài tập môn Giải tích cho sinh viên đại học",
-    image: "https://picsum.photos/200",
-  },
-  {
-    id: 2,
-    name: "Vật lý đại cương",
-    description:
-      "Ngân hàng đề thi môn Vật lý đại cương các chương trình đại học",
-    image: "https://picsum.photos/200",
-  },
-  {
-    id: 3,
-    name: "Hóa đại cương",
-    description: "Tổng hợp đề thi môn Hóa học đại cương cho sinh viên",
-    image: "https://picsum.photos/200",
-  },
-  {
-    id: 4,
-    name: "Sinh học phân tử",
-    description: "Bộ đề thi và bài tập môn Sinh học phân tử bậc đại học",
-    image: "https://picsum.photos/200",
-  },
-  {
-    id: 5,
-    name: "Tiếng Anh chuyên ngành",
-    description: "Đề thi Tiếng Anh chuyên ngành các ngành học",
-    image: "https://picsum.photos/200",
-  },
-  {
-    id: 6,
-    name: "Triết học đại cương",
-    description: "Ngân hàng đề thi môn Triết học đại cương",
-    image: "https://picsum.photos/200",
-  },
-];
+import { getPracticePage } from "@/app/service/practice_api";
+import Loading from "@/app/_components/common/Loading";
 
 export default function PracticePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
+  const [practicePage, setPracticePage] = useState<any[]>([]); // Initialize as empty array
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredSubjects = subjects.filter((subject) =>
-    subject.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSubjects =
+    practicePage?.filter((subject: any) =>
+      subject.content.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
 
   const handleSubjectClick = (subject: any) => {
-    const formattedName = subject.name
+    const formattedName = subject.content
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/\s+/g, "_");
     router.push(`/practice/${formattedName}/${subject.id}`);
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        const data = await getPracticePage();
+        setPracticePage(data.data.exam);
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white mt-[5rem]">
@@ -102,7 +86,7 @@ export default function PracticePage() {
 
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredSubjects.map((subject) => (
+          {filteredSubjects.map((subject: any) => (
             <Card
               key={subject.id}
               className="border-none shadow-md hover:shadow-xl transition-shadow"
@@ -110,17 +94,24 @@ export default function PracticePage() {
               <CardBody className="p-0">
                 <div className="relative w-full h-48">
                   <Image
-                    src={subject.image}
-                    alt={subject.name}
+                    src={
+                      subject.image?.url
+                        ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
+                        : "/default-image.jpg"
+                    }
+                    alt={subject.name || "Subject image"}
                     fill
                     className="object-cover rounded-t-xl"
+                    onError={(e: any) => {
+                      e.target.src = "/default-image.jpg";
+                    }}
                   />
                 </div>
                 <div className="p-6">
                   <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                    {subject.name}
+                    {subject.title}
                   </h2>
-                  <p className="text-gray-600">{subject.description}</p>
+                  <p className="text-gray-600">{subject.content}</p>
                 </div>
               </CardBody>
               <CardFooter className="px-6 pb-6 pt-0">
