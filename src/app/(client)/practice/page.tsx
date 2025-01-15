@@ -25,13 +25,14 @@ export default function PracticePage() {
     practicePage?.filter((subject: any) =>
       subject.content.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
-
-  const handleSubjectClick = (subject: any) => {
-    const formattedName = subject.content
+  const handleSubjectClick = (subject: any, count: number) => {
+    const formattedName = subject.title
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "_");
-    router.push(`/practice/${formattedName}/${subject.id}`);
+      .replace(/[đĐ]/g, "d") // Thêm xử lý riêng cho ký tự đ/Đ
+      .replace(/\s+/g, "_")
+      .toLowerCase(); // Chuyển tất cả thành chữ thường
+    router.push(`/practice/${formattedName}/${++count}`);
   };
 
   useEffect(() => {
@@ -86,47 +87,50 @@ export default function PracticePage() {
 
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredSubjects.map((subject: any) => (
-            <Card
-              key={subject.id}
-              className="border-none shadow-md hover:shadow-xl transition-shadow"
-            >
-              <CardBody className="p-0">
-                <div className="relative w-full h-48">
-                  <Image
-                    src={
-                      subject.image?.url
-                        ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
-                        : "/default-image.jpg"
-                    }
-                    alt={subject.name || "Subject image"}
-                    fill
-                    className="object-cover rounded-t-xl"
-                    onError={(e: any) => {
-                      e.target.src = "/default-image.jpg";
-                    }}
-                  />
-                </div>
-                <div className="p-6">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                    {subject.title}
-                  </h2>
-                  <p className="text-gray-600">{subject.content}</p>
-                </div>
-              </CardBody>
-              <CardFooter className="px-6 pb-6 pt-0">
-                <Button
-                  color="primary"
-                  radius="lg"
-                  className="w-full"
-                  size="lg"
-                  onClick={() => handleSubjectClick(subject)}
-                >
-                  Làm thử
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          {filteredSubjects.map((subject: any, index: number) => {
+            if (subject.status_try === false) return null;
+            return (
+              <Card
+                key={subject.id}
+                className="border-none shadow-md hover:shadow-xl transition-shadow"
+              >
+                <CardBody className="p-0">
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={
+                        subject.image?.url
+                          ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
+                          : "/default-image.jpg"
+                      }
+                      alt={subject.name || "Subject image"}
+                      fill
+                      className="object-cover rounded-t-xl"
+                      onError={(e: any) => {
+                        e.target.src = "/default-image.jpg";
+                      }}
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+                      {subject.title}
+                    </h2>
+                    <p className="text-gray-600">{subject.content}</p>
+                  </div>
+                </CardBody>
+                <CardFooter className="px-6 pb-6 pt-0">
+                  <Button
+                    color="primary"
+                    radius="lg"
+                    className="w-full"
+                    size="lg"
+                    onClick={() => handleSubjectClick(subject, index)}
+                  >
+                    Làm thử
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Pagination */}
