@@ -98,16 +98,13 @@ export default function PracticePage() {
                   <div className="relative w-full h-48">
                     <Image
                       src={
-                        subject.image?.url
-                          ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
-                          : "/default-image.jpg"
+                          `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
+                       
                       }
                       alt={subject.name || "Subject image"}
                       fill
-                      className="object-cover rounded-t-xl"
-                      onError={(e: any) => {
-                        e.target.src = "/default-image.jpg";
-                      }}
+                      className="object-cover rounded-t-xl "
+                    
                     />
                   </div>
                   <div className="p-6">

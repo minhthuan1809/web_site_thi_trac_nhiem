@@ -49,7 +49,6 @@ export default function Footer() {
       const dataSocialMedia = await getFooterSocialMedia();
       setSocialMedia(dataSocialMedia.data.footer.social_media);
 
-      console.log(dataSocialMedia);
     };
     fetchData();
   }, []);

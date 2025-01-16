@@ -21,6 +21,7 @@ const Introduction = () => {
       // get hero section
       const data = await getHomeSectionHero();
       setDataHeroSection(data.data.hero_section);
+      
 
       // get features section
       const dataFeature = await getHomeSectionFeature();
@@ -32,16 +33,17 @@ const Introduction = () => {
     };
 
     fetchData();
-  }, []);
+  },[]);
   if (!dataHeroSection || !dataFeatureSection || !dataStatisticsSection)
     return <Loading />;
   return (
     <div className="min-h-screen bg-white mt-[5rem]">
       {/* Hero Section */}
+      <h1>{dataHeroSection.url}</h1>
       <div className="relative h-[600px] w-full ">
         <img
-          src="https://eaut.edu.vn/wp-content/uploads/2023/10/AnyConv.com__bn6.webp"
-          alt="Hero background"
+          src={`${process.env.NEXT_PUBLIC_API_URL}${dataHeroSection.panner.url}`}
+          alt={dataHeroSection.panner.name || "image panne"}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">

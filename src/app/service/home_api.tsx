@@ -1,7 +1,7 @@
 // get home page
 export const getHomeSectionHero = async () => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/home?populate=*`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/home?populate=hero_section.panner`
   );
   const data = await response.json();
 
