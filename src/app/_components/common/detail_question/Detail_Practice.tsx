@@ -9,63 +9,56 @@ interface DetailPracticeProps {
   params: {
     slug: string[];
   };
+  data: any;
+  runtime?: number;
 }
 
-export default function Detail_Practice({ params }: DetailPracticeProps) {
+export default function Detail_Practice({
+  params,
+  data,
+  runtime,
+}: DetailPracticeProps) {
   const [numberQuestion, setNumberQuestion] = useState(1);
-  const [time, setTime] = useState(2000);
+  const [_time, _setTime] = useState<number>(runtime || 900); // mặc định là 15p
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: string;
-  }>({});
+  }>(JSON.parse(localStorage.getItem("selectedAnswers") || "{}"));
 
-  const questions = [
-    {
-      id: 1,
-      content: "Thủ đô của Việt Nam là gì?",
-      options: ["A. Hà Nội", "B. Hồ Chí Minh", "C. Đà Nẵng", "D. Hải Phòng"],
-      answer: "A",
-    },
-    {
-      id: 2,
-      content: "Sông nào dài nhất Việt Nam?",
-      options: ["A. Sông Hồng", "B. Sông Mê Kông", "C. Sông Đà", "D. Sông Lô"],
-      answer: "B",
-    },
-    {
-      id: 3,
-      content: "Đâu là món ăn truyền thống của Việt Nam?",
-      options: ["A. Sushi", "B. Pizza", "C. Phở", "D. Hamburger"],
-      answer: "C",
-    },
-    {
-      id: 4,
-      content: "Thủ đô của Việt Nam là gì?",
-      options: ["A. Hà Nội", "B. Hồ Chí Minh", "C. Đà Nẵng", "D. Hải Phòng"],
-      answer: "A",
-    },
-    {
-      id: 5,
-      content: "Sông nào dài nhất Việt Nam?",
-      options: ["A. Sông Hồng", "B. Sông Mê Kông", "C. Sông Đà", "D. Sông Lô"],
-      answer: "B",
-    },
-    {
-      id: 6,
-      content: "Đâu là món ăn truyền thống của Việt Nam?",
-      options: ["A. Sushi", "B. Pizza", "C. Phở", "D. Hamburger"],
-      answer: "C",
-    },
-  ];
+  // Cập nhật giá trị _time khi runtime thay đổi
+  useEffect(() => {
+    if (runtime) {
+      _setTime(runtime);
+    }
+  }, [runtime]);
 
-  const currentQuestion = questions[numberQuestion - 1];
+  // Tìm exam có title khớp với slug[0] sau khi chuẩn hóa
+  const matchingExam = data.find((exam: any) => {
+    const normalizedTitle = exam.title
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
+    return normalizedTitle === params.slug[0];
+  });
+
+  const questions = matchingExam?.question || [];
+  const currentQuestion = questions[numberQuestion - 1] || {};
 
   const handleAnswerChange = (value: string) => {
-    console.log(selectedAnswers);
-
     setSelectedAnswers((prev) => ({
       ...prev,
       [currentQuestion.id]: value,
     }));
+
+    // Lưu vào localStorage
+    localStorage.setItem(
+      "selectedAnswers",
+      JSON.stringify({
+        ...selectedAnswers,
+        [currentQuestion.id]: value,
+      })
+    );
   };
 
   return (
@@ -74,9 +67,9 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
         <div className="lg:w-3/4">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-2xl font-bold mb-4">
-              Câu hỏi {currentQuestion.id}
+              Câu hỏi {numberQuestion}
             </h2>
-            <p className="text-gray-700 mb-6">{currentQuestion.content}</p>
+            <p className="text-gray-700 mb-6">{currentQuestion.question}</p>
             <div className="space-y-4">
               <RadioGroup
                 color="primary"
@@ -84,11 +77,10 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
                 onValueChange={handleAnswerChange}
                 className="flex flex-col gap-2"
               >
-                {currentQuestion.options.map((option, index) => (
-                  <Radio key={index} value={option.charAt(0)}>
-                    {option}
-                  </Radio>
-                ))}
+                <Radio value="A">{currentQuestion.answerA}</Radio>
+                <Radio value="B">{currentQuestion.answerB}</Radio>
+                <Radio value="C">{currentQuestion.answerC}</Radio>
+                <Radio value="D">{currentQuestion.answerD}</Radio>
               </RadioGroup>
             </div>
             <div className="flex justify-between mt-8">
@@ -118,13 +110,14 @@ export default function Detail_Practice({ params }: DetailPracticeProps) {
         <div className="lg:w-1/4">
           <div className="bg-white rounded-lg shadow-md p-6">
             {/* thời gian */}
-            <Time value={time} _setTime={setTime} />
+            <Time value={_time} _setTime={_setTime} />
             <h3 className="text-xl font-semibold mb-4">Danh sách câu hỏi</h3>
             {/* số lượng câu hỏi */}
             <Number
               length={questions.length}
               question={numberQuestion}
               setQuestion={setNumberQuestion}
+              data={currentQuestion}
             />
           </div>
         </div>

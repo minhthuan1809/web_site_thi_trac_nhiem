@@ -7,3 +7,12 @@ export const getPracticePage = async () => {
 
   return data;
 };
+
+// get practice detail
+export const getPracticeDetail = async () => {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/practice?populate=exam.question`
+  );
+  const data = await response.json();
+  return data;
+};

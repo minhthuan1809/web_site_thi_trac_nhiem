@@ -25,6 +25,7 @@ export default function PracticePage() {
     practicePage?.filter((subject: any) =>
       subject.content.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
+  
   const handleSubjectClick = (subject: any, count: number) => {
     const formattedName = subject.title
       .normalize("NFD")
@@ -98,13 +99,16 @@ export default function PracticePage() {
                   <div className="relative w-full h-48">
                     <Image
                       src={
-                          `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
-                       
+                        subject.image?.url
+                          ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
+                          : "/default-image.jpg"
                       }
                       alt={subject.name || "Subject image"}
                       fill
-                      className="object-cover rounded-t-xl "
-                    
+                      className="object-cover rounded-t-xl"
+                      onError={(e: any) => {
+                        e.target.src = "/default-image.jpg";
+                      }}
                     />
                   </div>
                   <div className="p-6">
