@@ -11,21 +11,23 @@ export default function Number({
   setQuestion: (question: number) => void;
   data: any;
 }) {
-  console.log("data", data);
+  const answered = JSON.parse(localStorage.getItem("selectedAnswers") || "{}");
+
+  // Create an array of question IDs based on the current data structure
+  const questionIds = Array.from({ length }, (_, index) => index + 1);
 
   return (
     <>
       <div className="grid grid-cols-6 gap-2">
-        {Array.from({ length: length }, (_, index) => (
+        {questionIds.map((index) => (
           <button
             key={index}
-            id={data.id}
-            className={`flex items-center justify-center w-10 h-10  rounded-full ${
-              question === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200"
+            className={`flex items-center justify-center w-10 h-10 rounded-full ${
+              answered[index] ? "bg-blue-600 text-white" : "bg-gray-200"
             }`}
-            onClick={() => setQuestion(index + 1)}
+            onClick={() => setQuestion(index)}
           >
-            {index + 1}
+            {index}
           </button>
         ))}
       </div>

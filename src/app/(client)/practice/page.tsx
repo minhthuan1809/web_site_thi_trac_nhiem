@@ -25,12 +25,12 @@ export default function PracticePage() {
     practicePage?.filter((subject: any) =>
       subject.content.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
-  
+
   const handleSubjectClick = (subject: any, count: number) => {
     const formattedName = subject.title
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[đĐ]/g, "d") // Thêm xử lý riêng cho ký tự đ/Đ
+      .replace(/[đĐ]/g, "d")
       .replace(/\s+/g, "_")
       .toLowerCase(); // Chuyển tất cả thành chữ thường
     router.push(`/practice/${formattedName}/${++count}`);
@@ -89,7 +89,7 @@ export default function PracticePage() {
         {/* Subjects Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredSubjects.map((subject: any, index: number) => {
-            if (subject.status_try === false) return null;
+            if (subject.status_try) return null;
             return (
               <Card
                 key={subject.id}
