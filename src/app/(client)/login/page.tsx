@@ -2,10 +2,19 @@
 import { useState } from "react";
 import Input from "@/app/_components/common/Input";
 import Link from "next/link";
+import { Button } from "@nextui-org/react";
+import Icon from "@/app/_components/common/Icon";
+import { requestLoginStudent } from "@/app/service/login_api";
 
 export default function PageLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [type, setType] = useState("student");
+
+  const handleLogin = (e: any) => {
+    e.preventDefault();
+    requestLoginStudent(email, password);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -29,7 +38,34 @@ export default function PageLogin() {
               Chào mừng bạn quay trở lại! Vui lòng nhập thông tin.
             </p>
           </div>
-
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Button
+              className={`w-full bg-gradient-to-r text-gray-500  rounded-xl py-4 font-medium  transition-all duration-300 shadow-lg hover:shadow-xl ${
+                type === "student"
+                  ? "from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
+                  : ""
+              }`}
+              onClick={() => setType("student")}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Icon icon="GraduationCap" className="w-7 h-7" size={30} />
+                <span>Sinh viên</span>
+              </div>
+            </Button>
+            <Button
+              onClick={() => setType("teacher")}
+              className={`w-full bg-gradient-to-r text-gray-500 rounded-xl py-4 font-medium  transition-all duration-300 shadow-lg hover:shadow-xl ${
+                type === "teacher"
+                  ? "from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800  text-white"
+                  : ""
+              }`}
+            >
+              <div className="flex items-center justify-center gap-2">
+                <Icon icon="School" className="w-6 h-6" size={30} />
+                <span>Giáo viên</span>
+              </div>
+            </Button>
+          </div>
           <form className="space-y-6">
             <Input
               placeholder="Nhập email của trường"
@@ -72,7 +108,7 @@ export default function PageLogin() {
 
             <div className="space-y-4">
               <button
-                type="submit"
+                onClick={handleLogin}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-lg"
               >
                 Đăng Nhập

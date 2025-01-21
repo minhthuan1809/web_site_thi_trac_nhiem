@@ -51,8 +51,8 @@ export default function Detail_Practice({
       [currentQuestion.id]: value,
     }));
 
-    // Lưu vào localStorage
-    localStorage.setItem(
+    // Lưu vào sessionStorage
+    sessionStorage.setItem(
       "selectedAnswers",
       JSON.stringify({
         ...selectedAnswers,
@@ -85,7 +85,9 @@ export default function Detail_Practice({
             </div>
             <div className="flex justify-between mt-8">
               <button
-                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                className={`px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300
+                  ${numberQuestion === 1 ? "cursor-not-allowed" : ""}
+                `}
                 onClick={() =>
                   setNumberQuestion(Math.max(1, numberQuestion - 1))
                 }
@@ -94,7 +96,13 @@ export default function Detail_Practice({
                 Câu trước
               </button>
               <button
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className={`px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700
+                  ${
+                    numberQuestion === questions.length
+                      ? "cursor-not-allowed"
+                      : ""
+                  }
+                `}
                 onClick={() =>
                   setNumberQuestion(
                     Math.min(questions.length, numberQuestion + 1)
@@ -114,10 +122,9 @@ export default function Detail_Practice({
             <h3 className="text-xl font-semibold mb-4">Danh sách câu hỏi</h3>
             {/* số lượng câu hỏi */}
             <Number
-              length={questions.length}
               question={numberQuestion}
               setQuestion={setNumberQuestion}
-              data={currentQuestion}
+              data={questions}
             />
           </div>
         </div>

@@ -13,14 +13,11 @@ export default function NavBar() {
   const [items, setItems] = useState<any[]>([]);
   const [btnNav, setBtnNav] = useState<any[]>([]);
 
-
   useEffect(() => {
     const fetchData = async () => {
-      
       const data = await getLogo();
       const dataNavItems = await getNavItems();
       const dataNavBtn = await getNavBtn();
-
 
       setLogo(data.data.navbar.logo.url);
       setItems(dataNavItems.data.navbar.items);
@@ -63,7 +60,7 @@ export default function NavBar() {
                 </Link>
               ))}
             </div>
-            <div className="relative group">
+            {/* <div className="relative group">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div className="border border-blue-600 rounded-full p-1">
                   <Avatar
@@ -98,20 +95,20 @@ export default function NavBar() {
                   <span className="font-medium">Đăng xuất</span>
                 </button>
               </div>
-            </div>
-            {/* btn login */}
-            {/* <div className="flex gap-4">
-             {btnNav.map((item, index) => (
-              <Link
-                href={item.url}
-                key={index}
-                target={item.target}
-                className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg"
-              >
-                {item.title}
-              </Link>
-             ))}
             </div> */}
+            {/* btn login */}
+            <div className="flex gap-4">
+              {btnNav.map((item, index) => (
+                <Link
+                  href={item.url}
+                  key={index}
+                  target={item.target}
+                  className="px-6 py-3 rounded-lg bg-blue-500 text-white hover:bg-blue-600 text-lg"
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </nav>

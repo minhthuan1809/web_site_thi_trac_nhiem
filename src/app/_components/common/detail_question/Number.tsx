@@ -1,37 +1,57 @@
 import React from "react";
 
 export default function Number({
-  length,
   question,
   setQuestion,
   data,
 }: {
-  length: number;
   question: number;
   setQuestion: (question: number) => void;
   data: any;
 }) {
-  const answered = JSON.parse(localStorage.getItem("selectedAnswers") || "{}");
+  const answered = JSON.parse(
+    sessionStorage.getItem("selectedAnswers") || "{}"
+  );
 
-  // Create an array of question IDs based on the current data structure
-  const questionIds = Array.from({ length }, (_, index) => index + 1);
+  // xử lý sự kiện nộp bài
+  const handleSubmit = () => {
+    if (Object.keys(answered).length !== data.length) {
+      confirm("Vui lòng trả lời tất cả câu hỏi");
+    }
+  };
 
   return (
     <>
       <div className="grid grid-cols-6 gap-2">
-        {questionIds.map((index) => (
+        {data.map((item: any, index: number) => (
           <button
-            key={index}
-            className={`flex items-center justify-center w-10 h-10 rounded-full ${
-              answered[index] ? "bg-blue-600 text-white" : "bg-gray-200"
-            }`}
-            onClick={() => setQuestion(index)}
+            key={index + 1}
+            className={`flex items-center justify-center w-10 h-10 rounded-full
+              ${
+                index + 1 === question // số câu hỏi đang chọn
+                  ? "bg-blue-600 text-white"
+                  : Object.keys(answered).includes(item.id.toString()) // câu hỏi đã trả lời
+                  ? "bg-gray-400 text-white"
+                  : "bg-gray-200"
+              }
+              `}
+            onClick={() => setQuestion(index + 1)}
           >
-            {index}
+            {index + 1}
           </button>
         ))}
       </div>
-      <button className="w-full bg-blue-600 text-white rounded-xl py-3 font-medium hover:bg-blue-700 transition-colors mt-6">
+      <button
+        className={`w-full  text-white rounded-xl py-3 font-medium  transition-colors mt-6
+          ${
+            Object.keys(answered).length !== data.length
+              ? "cursor-not-allowed bg-gray-400 text-gray-700"
+              : "bg-blue-600 hover:bg-blue-700"
+          }
+        `}
+        onClick={handleSubmit}
+        disabled={Object.keys(answered).length !== data.length}
+      >
         Nộp bài
       </button>
     </>
