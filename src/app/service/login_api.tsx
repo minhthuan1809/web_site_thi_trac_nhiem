@@ -1,4 +1,7 @@
+import { toast } from "react-toastify";
+
 export const requestLoginStudent = async (email: string, password: string) => {
+  toast.dismiss();
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/auth/local`,
@@ -15,6 +18,11 @@ export const requestLoginStudent = async (email: string, password: string) => {
     );
 
     const data = await response.json();
+    if (data.jwt) {
+      toast.success("Đăng nhập thành công");
+    } else {
+      toast.error("Đăng nhập thất bại");
+    }
     console.log(data);
     return data;
   } catch (error) {

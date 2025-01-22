@@ -62,7 +62,7 @@ export default function PageLogin() {
             >
               <div className="flex items-center justify-center gap-2">
                 <Icon icon="School" className="w-6 h-6" size={30} />
-                <span>Giáo viên</span>
+                <span>Giảng viên</span>
               </div>
             </Button>
           </div>
