@@ -24,8 +24,6 @@ export default function PageLogin() {
     if (getCookie("jwt")) {
       deleteCookie("jwt");
     }
-
-
   }, []);
 
   // hàm đăng nhập
@@ -33,9 +31,24 @@ export default function PageLogin() {
     e.preventDefault();
     toast.dismiss();
     const data = await requestLogin(email, password);
+    console.log(data);
 
     if (data.error) {
-      toast.error("Liên hệ với nhà trường để khắc phục");
+      toast.error(
+        data.error.message
+          .replace(
+            "Invalid identifier or password",
+            "Thông tin tài khoản hoặc mật khẩu không chính xác !"
+          )
+          .replace(
+            "Your account has been blocked by an administrator",
+            "Liên hệ với nhà trường để khắc phục"
+          )
+          .replace(
+            "Too many requests, please try again later.",
+            "Quá nhiều yêu cầu, vui lòng thử lại sau."
+          )
+      );
       return;
     }
     if (data.jwt) {
@@ -98,14 +111,16 @@ export default function PageLogin() {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">
+                  className="ml-2 block text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors"
+                >
                   Ghi nhớ đăng nhập
                 </label>
               </div>
 
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline">
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline"
+              >
                 Quên mật khẩu?
               </Link>
             </div>
@@ -113,7 +128,8 @@ export default function PageLogin() {
             <div className="space-y-4">
               <button
                 onClick={handleLogin}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-lg">
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-lg"
+              >
                 Đăng Nhập
               </button>
             </div>
