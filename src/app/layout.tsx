@@ -19,7 +19,7 @@ export default function RootLayout({
       <body>
         <Providers>
           {children}
-          <ToastContainer />
+          <ToastContainer autoClose={900}/>
         </Providers>
       </body>
     </html>

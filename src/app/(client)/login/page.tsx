@@ -1,21 +1,54 @@
 "use client";
-import { useState } from "react";
-import Input from "@/app/_components/common/Input";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@nextui-org/react";
-import Icon from "@/app/_components/common/Icon";
-import { requestLoginStudent } from "@/app/service/login_api";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { deleteCookie, getCookie, setCookie } from "cookies-next";
 
+// import thư viện từ bên trong
+import Input from "@/app/_components/common/Input";
+import { requestLogin } from "@/app/service/login_api";
+
+// vần xử lý code
 export default function PageLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [type, setType] = useState("student");
+  const router = useRouter();
 
-  const handleLogin = (e: any) => {
+  // kiểm tra xem có token không
+  useEffect(() => {
+    if (getCookie("jwt")) {
+      router.push("/");
+    }
+    if (getCookie("jwt")) {
+      deleteCookie("jwt");
+    }
+
+
+  }, []);
+
+  // hàm đăng nhập
+  const handleLogin = async (e: any) => {
     e.preventDefault();
-    requestLoginStudent(email, password);
-  };
+    toast.dismiss();
+    const data = await requestLogin(email, password);
 
+    if (data.error) {
+      toast.error("Liên hệ với nhà trường để khắc phục");
+      return;
+    }
+    if (data.jwt) {
+      setCookie("jwt", data.jwt, {
+        maxAge: 60 * 60 * 24, // 1 ngày
+        path: "/",
+      });
+      router.push("/");
+      toast.success("Đăng nhập thành công");
+    } else {
+      toast.error("Đăng nhập thất bại");
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
@@ -29,7 +62,7 @@ export default function PageLogin() {
         </div>
 
         {/* Phần bên phải - Form đăng nhập */}
-        <div className="flex flex-col justify-center px-8 py-12 space-y-8">
+        <div className="flex flex-col justify-center px-8 py-12 space-y-2">
           <div className="sm:mx-auto sm:w-full sm:max-w-md">
             <h2 className="text-center text-4xl font-bold text-blue-800 mb-6 tracking-tight">
               Đăng Nhập
@@ -38,34 +71,7 @@ export default function PageLogin() {
               Chào mừng bạn quay trở lại! Vui lòng nhập thông tin.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button
-              className={`w-full bg-gradient-to-r text-gray-500  rounded-xl py-4 font-medium  transition-all duration-300 shadow-lg hover:shadow-xl ${
-                type === "student"
-                  ? "from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white"
-                  : ""
-              }`}
-              onClick={() => setType("student")}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Icon icon="GraduationCap" className="w-7 h-7" size={30} />
-                <span>Sinh viên</span>
-              </div>
-            </Button>
-            <Button
-              onClick={() => setType("teacher")}
-              className={`w-full bg-gradient-to-r text-gray-500 rounded-xl py-4 font-medium  transition-all duration-300 shadow-lg hover:shadow-xl ${
-                type === "teacher"
-                  ? "from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800  text-white"
-                  : ""
-              }`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                <Icon icon="School" className="w-6 h-6" size={30} />
-                <span>Giảng viên</span>
-              </div>
-            </Button>
-          </div>
+
           <form className="space-y-6">
             <Input
               placeholder="Nhập email của trường"
@@ -92,16 +98,14 @@ export default function PageLogin() {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors"
-                >
+                  className="ml-2 block text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors">
                   Ghi nhớ đăng nhập
                 </label>
               </div>
 
               <Link
                 href="/forgot-password"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline"
-              >
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline">
                 Quên mật khẩu?
               </Link>
             </div>
@@ -109,8 +113,7 @@ export default function PageLogin() {
             <div className="space-y-4">
               <button
                 onClick={handleLogin}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-lg"
-              >
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 shadow-lg">
                 Đăng Nhập
               </button>
             </div>

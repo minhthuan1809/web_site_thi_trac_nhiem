@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -14,68 +14,64 @@ import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { Tooltip } from "@nextui-org/tooltip";
 import { SearchIcon } from "@nextui-org/shared-icons";
+import { getItemExam } from "@/app/service/exams_api";
 
 export default function ExamPage() {
-  // Mock data for exams
-  const exams = [
-    {
-      id: 1,
-      subject: "Lập trình web",
-      lecturer: "Nguyễn Văn A",
-      class: "IT001",
-      date: "2024-01-10",
-      duration: "90 phút",
-      time: "07:00",
-      status: "Sắp diễn ra", // upcoming
-    },
-    {
-      id: 2,
-      subject: "Cơ sở dữ liệu",
-      lecturer: "Trần Thị B",
-      class: "IT002",
-      date: "2024-01-12",
-      duration: "120 phút",
-      time: "09:30",
-      status: "Đang mở", // open
-    },
-    {
-      id: 3,
-      subject: "An toàn thông tin",
-      lecturer: "Lê Văn C",
-      class: "IT003",
-      date: "2024-01-15",
-      duration: "60 phút",
-      time: "13:30",
-      status: "Chưa mở", // not open
-    },
-  ];
-
+  const [exams, setExams] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+let count = 0;
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getItemExam();
+      const examData = data?.data.map((exam: any) => {
+        const now = new Date();
+        const examDate = new Date(exam.exam_day);
+        const closeDate = new Date(exam.day_close);
+        
+        let status = "closed";
+        if (now < examDate) {
+          status = "upcoming";
+        } else if (now >= examDate && now <= closeDate) {
+          status = "open";
+        }
+        
+        return {
+          ...exam,
+          status_exam: status
+        };
+      }) || [];
+      
+      setExams(examData);
+    };
+    fetchData();
+  }, []);
 
-  const filteredExams = exams.filter((exam) =>
+  const filteredExams = exams?.filter((exam) =>
     Object.values(exam).some((value) =>
-      value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
     )
-  );
+  ) || [];
 
   const columns = [
+    { name: "STT", uid: "documentId" },
     { name: "MÔN HỌC", uid: "subject" },
     { name: "GIẢNG VIÊN", uid: "lecturer" },
     { name: "LỚP", uid: "class" },
-    { name: "NGÀY THI", uid: "date" },
-    { name: "THỜI GIAN", uid: "time" },
+    { name: "NGÀY THI", uid: "exam_day" },
+    { name: "NGÀY ĐÓNG", uid: "day_close" },
     { name: "THỜI LƯỢNG", uid: "duration" },
-    { name: "TRẠNG THÁI", uid: "status" },
+    { name: "ĐIỂM", uid: "point" },
+    { name: "TRẠNG THÁI", uid: "status_exam" },
     { name: "HÀNH ĐỘNG", uid: "actions" },
   ];
 
   const getStatusColor = (status: any) => {
     switch (status) {
-      case "Đang mở":
+      case "open":
         return "success";
-      case "Sắp diễn ra":
+      case "upcoming":
         return "warning";
-      case "Chưa mở":
+      case "closed":
         return "default";
       default:
         return "default";
@@ -83,8 +79,23 @@ export default function ExamPage() {
   };
 
   const handleStartExam = (examId: any) => {
-    // Xử lý khi sinh viên bắt đầu làm bài
     console.log("Bắt đầu bài thi:", examId);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit', 
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatDuration = (seconds: string) => {
+    const minutes = Math.floor(parseInt(seconds) / 60);
+    return `${minutes} phút`;
   };
 
   return (
@@ -100,17 +111,15 @@ export default function ExamPage() {
             </div>
             <div className="flex items-center gap-2">
               <Chip color="success" variant="shadow">
-                Đang mở: {exams.filter((e) => e.status === "Đang mở").length}
+                Đang mở: {exams?.filter((e) => e.status_exam === "open").length || 0}
               </Chip>
               <Chip color="warning" variant="shadow">
-                Sắp diễn ra:{" "}
-                {exams.filter((e) => e.status === "Sắp diễn ra").length}
+                Sắp diễn ra: {exams?.filter((e) => e.status_exam === "upcoming").length || 0}
               </Chip>
             </div>
           </div>
         </CardHeader>
         <CardBody>
-          {/* Search section */}
           <div className="mb-6">
             <Input
               isClearable
@@ -124,7 +133,6 @@ export default function ExamPage() {
             />
           </div>
 
-          {/* Table section */}
           <Table
             aria-label="Danh sách bài thi"
             classNames={{
@@ -148,6 +156,9 @@ export default function ExamPage() {
                   className="cursor-pointer hover:bg-gray-50/50"
                 >
                   <TableCell>
+                    <div className="font-medium">{++count}</div>
+                  </TableCell>
+                  <TableCell>
                     <div className="font-medium">{item.subject}</div>
                   </TableCell>
                   <TableCell>{item.lecturer}</TableCell>
@@ -156,40 +167,42 @@ export default function ExamPage() {
                       {item.class}
                     </Chip>
                   </TableCell>
-                  <TableCell>{item.date}</TableCell>
-                  <TableCell>{item.time}</TableCell>
+                  <TableCell>{formatDate(item.exam_day)}</TableCell>
+                  <TableCell>{formatDate(item.day_close)}</TableCell>
                   <TableCell>
                     <Chip size="sm" variant="dot">
-                      {item.duration}
+                      {formatDuration(item.duration)}
                     </Chip>
                   </TableCell>
+                  <TableCell>{item.point}</TableCell>
                   <TableCell>
                     <Chip
-                      color={getStatusColor(item.status)}
+                      color={getStatusColor(item.status_exam)}
                       variant="flat"
                       size="sm"
                     >
-                      {item.status}
+                      {item.status_exam === "open" ? "Đang mở" : 
+                       item.status_exam === "upcoming" ? "Sắp diễn ra" : "Đã đóng"}
                     </Chip>
                   </TableCell>
                   <TableCell>
                     <Tooltip
                       content={
-                        item.status === "Đang mở"
+                        item.status_exam === "open"
                           ? "Bắt đầu làm bài"
                           : "Bài thi chưa được mở"
                       }
                     >
                       <Button
                         color={
-                          item.status === "Đang mở" ? "primary" : "default"
+                          item.status_exam === "open" ? "primary" : "default"
                         }
                         variant="flat"
                         size="sm"
-                        onClick={() => handleStartExam(item.id)}
-                        disabled={item.status !== "Đang mở"}
+                        onClick={() => handleStartExam(item.documentId)}
+                        disabled={item.status_exam !== "open"}
                       >
-                        {item.status === "Đang mở" ? "Làm bài" : "Chưa mở"}
+                        {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}
                       </Button>
                     </Tooltip>
                   </TableCell>

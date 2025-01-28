@@ -1,131 +1,25 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "@/app/_components/common/Input";
 import Icon from "@/app/_components/common/Icon";
+import { getUserInfo } from "@/app/service/Navbar_api";
+import Loading from "@/app/_components/common/Loading";
 
 export default function Profile() {
-  const [formData, setFormData] = useState({
-    studentId: {
-      value: "20210533",
-      placeholder: "Nhập mã sinh viên",
-      label: "Mã sinh viên",
-      icon: "HashIcon",
-    },
-    fullName: {
-      value: "Nguyễn Minh Thuận",
-      placeholder: "Nhập họ và tên",
-      label: "Họ và tên",
-      icon: "UserIcon",
-    },
-    dateOfBirth: {
-      value: "18/09/2003",
-      placeholder: "Nhập ngày sinh",
-      label: "Ngày sinh",
-      icon: "CalendarIcon",
-    },
-    gender: {
-      value: "Nam",
-      placeholder: "Nhập giới tính",
-      label: "Giới tính",
-      icon: "UserIcon",
-    },
-    birthPlace: {
-      value: "Gia Lai",
-      placeholder: "Nhập nơi sinh",
-      label: "Nơi sinh",
-      icon: "MapPinIcon",
-    },
-    hometown: {
-      value: "Vạn Kim, Mỹ Đức, Hà Nội",
-      placeholder: "Nhập quê quán",
-      label: "Quê quán",
-      icon: "HomeIcon",
-    },
-    nationality: {
-      value: "Việt Nam",
-      placeholder: "Nhập quốc tịch",
-      label: "Quốc tịch",
-      icon: "FlagIcon",
-    },
-    ethnicity: {
-      value: "Kinh",
-      placeholder: "Nhập dân tộc",
-      label: "Dân tộc",
-      icon: "UsersIcon",
-    },
-    religion: {
-      value: "",
-      placeholder: "Nhập tôn giáo",
-      label: "Tôn giáo",
-      icon: "HeartIcon",
-    },
-    background: {
-      value: "Nông dân",
-      placeholder: "Nhập thành phần xuất thân",
-      label: "Thành phần xuất thân",
-      icon: "UserIcon",
-    },
-    address: {
-      value: "Làng Le 2, La Lang, Đức Cơ, Gia Lai",
-      placeholder: "Nhập địa chỉ",
-      label: "Địa chỉ",
-      icon: "MapPinIcon",
-    },
+  const [formData, setFormData] = useState<any>({});
 
-    subsidyType: {
-      value: "Học sinh phổ thông",
-      placeholder: "Nhập loại trợ cấp",
-      label: "Loại trợ cấp",
-      icon: "UserIcon",
-    },
-    homePhone: {
-      value: "0355665985",
-      placeholder: "Nhập điện thoại nhà riêng",
-      label: "Điện thoại nhà riêng",
-      icon: "PhoneIcon",
-    },
-    mobilePhone: {
-      value: "0325397277",
-      placeholder: "Nhập điện thoại di động",
-      label: "Điện thoại di động",
-      icon: "SmartphoneIcon",
-    },
-    email: {
-      value: "20210533@eaut.edu.vn",
-      placeholder: "Nhập email",
-      label: "Email",
-      icon: "MailIcon",
-    },
-    class: {
-      value: "DCCNTT12.10.2",
-      placeholder: "Nhập lớp",
-      label: "Lớp",
-      icon: "School",
-    },
-    major: {
-      value: "Công nghệ thông tin",
-      placeholder: "Nhập ngành học",
-      label: "Ngành học",
-      icon: "School",
-    },
-    interlock: {
-      value: "K12",
-      placeholder: "Nhập khóa",
-      label: "Khóa",
-      icon: "School",
-    },
-  });
+  useEffect(() => {
+    const dataUserInfo = async () => {
+      const data = await getUserInfo();
+      setFormData(data);
+    };
+    dataUserInfo();
+  }, []);
 
-  const handleChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: {
-        ...prev[name as keyof typeof formData],
-        value,
-      },
-    }));
-  };
 
+if (!formData) {
+  return <Loading/>
+}
   return (
     <div className="flex flex-col gap-6 shadow-sm border border-gray-100 rounded-lg p-6">
       <div>
@@ -137,22 +31,87 @@ export default function Profile() {
         </div>
         <p className="text-gray-500 flex items-center gap-2 mt-2">
           <Icon icon="InfoIcon" className="text-gray-400" />
-          Thông tin sinh viên
+          {formData.role_user === "students" ? "Thông tin sinh viên" : "Thông tin giảng viên"}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-        {Object.entries(formData).map(([name, field], index) => (
+      {formData.role_user === "students" && (
+        <>
+          {/* sinh viên */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+            <Input
+              label="Họ và tên"
+              value={formData.username}
+              placeholder="Họ và tên"
+              icon="UserIcon"
+              onChange={() => {}}
+            />
+            <Input
+              label="Email"
+              value={formData.email}
+              placeholder="Email"
+              icon="Mail"
+              onChange={() => {}}
+            />
+            <Input
+              label="Mã sinh viên"
+              value={formData.information_user.mav}
+              placeholder="Mã sinh viên"
+              icon="Fingerprint"
+              onChange={() => {}}
+            />
+            <Input
+              label="Lớp"
+              value={formData.information_user.class}
+              placeholder="Lớp"
+              icon="Users"
+              onChange={() => {}}
+            />
+            <Input
+              label="Ngành học"
+              value={formData.information_user.study}
+              placeholder="Ngành học"
+              icon="GraduationCap"
+              onChange={() => {}}
+            />
+            <Input
+              label="Khóa"
+              value={formData.information_user.lock}
+              placeholder="Khóa"
+              icon="Key"
+              onChange={() => {}}
+            />
+          </div>
+        </>
+      )}
+      {/* giảng viên */}
+      {formData.role_user === "lecturer" && (
+        <>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
           <Input
-            key={index}
-            placeholder={field.placeholder}
-            value={field.value}
-            onChange={(value) => handleChange(name, value)}
-            label={field.label}
-            icon={field.icon}
-          />
-        ))}
-      </div>
+              label="Họ và tên"
+              value={formData.username}
+              placeholder="Họ và tên"
+              icon="UserIcon"
+              onChange={() => {}}
+            />
+            <Input
+              label="Email"
+              value={formData.email}
+              placeholder="Email"
+              icon="Mail"
+              onChange={() => {}}
+            />
+            <Input
+              label="Mã giảng viên"
+              value={formData.information_teacher.mgv}
+              placeholder="Mã giảng viên"
+              icon="Fingerprint"
+              onChange={() => {}}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }
