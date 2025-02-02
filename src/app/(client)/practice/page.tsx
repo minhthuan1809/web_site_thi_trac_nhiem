@@ -42,6 +42,7 @@ export default function PracticePage() {
         setIsLoading(true);
         const data = await getPracticePage();
         setPracticePage(data.data.exam);
+        console.log(data);
       } catch (error) {
         console.error("Error:", error);
       } finally {

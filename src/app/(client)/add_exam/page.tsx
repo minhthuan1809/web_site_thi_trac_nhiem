@@ -12,50 +12,67 @@ import { Input } from "@nextui-org/input";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
-import { Tooltip } from "@nextui-org/tooltip";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { getItemExam } from "@/app/service/exams_api";
+import Modal_add_exam from "./Modal_add_exam";
+import { deleteExam } from "@/app/service/examquestion";
 import { useStore } from "@/app/store";
+
+
+
 export default function ExamPage() {
+
+  // khai báo biến
   const [exams, setExams] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   let count = 0;
-  const { dataUsers } = useStore();
+  const [isOpenModalCreate, setIsOpenModalCreate] = useState(false);
+  const onOpenChangeCreate = () => setIsOpenModalCreate(!isOpenModalCreate);
+  const [reload, setReload] = useState(false);
 
+  const { dataUsers } = useStore();
+  // lấy dữ liệu
   useEffect(() => {
+    
     const fetchData = async () => {
       const data = await getItemExam();
+
       const examData = data?.data.map((exam: any) => {
         const now = new Date();
         const examDate = new Date(exam.exam_day);
         const closeDate = new Date(exam.day_close);
+
         let status = "closed";
         if (now < examDate) {
           status = "upcoming";
         } else if (now >= examDate && now <= closeDate) {
           status = "open";
         }
-        // Nếu là sinh viên, chỉ lấy bài thi của lớp đó
-        if (dataUsers.role_user === "students" && exam.class.trim().toLowerCase() === dataUsers.information_user.class.trim().toLowerCase()) {
+
+        // Nếu là giảng viên, chỉ lấy bài thi của giảng viên đó
+        if (dataUsers.role_user === "lecturer" && exam.lecturer === dataUsers.username) {
           return {
             ...exam,
             status_exam: status,
           };
         }
-        
+
+
+        // Nếu không phải giảng viên hoặc không phải bài thi của giảng viên đó
         return null;
       }).filter(Boolean) || [];
-      
+
       setExams(examData);
     };
     fetchData();
-  }, [dataUsers]);
+  }, [reload, dataUsers]);
 
-  const filteredExams = exams?.filter((exam) =>
-    Object.values(exam).some((value) =>
-      value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  ) || [];
+  const filteredExams =
+    exams?.filter((exam) =>
+      Object.values(exam).some((value) =>
+        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    ) || [];
 
   const columns = [
     { name: "STT", uid: "documentId" },
@@ -83,24 +100,31 @@ export default function ExamPage() {
     }
   };
 
-  const handleStartExam = (examId: any) => {
-    console.log("Bắt đầu bài thi:", examId);
-  };
+  // const handleStartExam = (examId: any) => {
+  //   console.log("Bắt đầu bài thi:", examId);
+  // };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatDuration = (seconds: string) => {
     const minutes = Math.floor(parseInt(seconds) / 60);
     return `${minutes} phút`;
+  };
+
+
+  const handleDeleteExam = (id: any) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa bài thi này không?")) return;
+    deleteExam(id);
+    setReload(prev => !prev);
   };
 
   return (
@@ -116,16 +140,18 @@ export default function ExamPage() {
             </div>
             <div className="flex items-center gap-2">
               <Chip color="success" variant="shadow">
-                Đang mở: {exams?.filter((e) => e.status_exam === "open").length || 0}
+                Đang mở:{" "}
+                {exams?.filter((e) => e.status_exam === "open").length || 0}
               </Chip>
               <Chip color="warning" variant="shadow">
-                Sắp diễn ra: {exams?.filter((e) => e.status_exam === "upcoming").length || 0}
+                Sắp diễn ra:{" "}
+                {exams?.filter((e) => e.status_exam === "upcoming").length || 0}
               </Chip>
             </div>
           </div>
         </CardHeader>
         <CardBody>
-          <div className="mb-6">
+          <div className="mb-6 flex items-center justify-between gap-2">
             <Input
               isClearable
               startContent={<SearchIcon className="text-default-300" />}
@@ -136,6 +162,12 @@ export default function ExamPage() {
               size="lg"
               variant="bordered"
             />
+            <Button
+              className="bg-blue-500 border p-6 hover:bg-blue-500/80 text-white"
+              onClick={onOpenChangeCreate}
+            >
+              Thêm bài thi
+            </Button>
           </div>
 
           <Table
@@ -186,30 +218,29 @@ export default function ExamPage() {
                       variant="flat"
                       size="sm"
                     >
-                      {item.status_exam === "open" ? "Đang mở" : 
-                       item.status_exam === "upcoming" ? "Sắp diễn ra" : "Đã đóng"}
+                      {item.status_exam === "open"
+                        ? "Đang mở"
+                        : item.status_exam === "upcoming"
+                        ? "Sắp diễn ra"
+                        : "Đã đóng"}
                     </Chip>
                   </TableCell>
-                  <TableCell>
-                    <Tooltip
-                      content={
-                        item.status_exam === "open"
-                          ? "Bắt đầu làm bài"
-                          : "Bài thi chưa được mở"
-                      }
+                  <TableCell className="flex items-center gap-2">
+                    <Button
+                      variant="flat"
+                      size="sm"
+                      className="bg-red-500 text-white"
+                      onClick={() => handleDeleteExam(item.id)}
                     >
-                      <Button
-                        color={
-                          item.status_exam === "open" ? "primary" : "default"
-                        }
-                        variant="flat"
-                        size="sm"
-                        onClick={() => handleStartExam(item.documentId)}
-                        disabled={item.status_exam !== "open"}
-                      >
-                        {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}
-                      </Button>
-                    </Tooltip>
+                      Xóa
+                    </Button>
+                    <Button
+                      variant="flat"
+                      size="sm"
+                      className="bg-blue-500 text-white"
+                    >
+                      Sửa
+                    </Button>
                   </TableCell>
                 </TableRow>
               )}
@@ -217,6 +248,14 @@ export default function ExamPage() {
           </Table>
         </CardBody>
       </Card>
+      {/* modal add exam */}
+      {isOpenModalCreate && (
+        <Modal_add_exam
+        onClose={onOpenChangeCreate}
+        setReload={setReload}
+        reload={reload}
+        />
+      )}
     </div>
   );
 }

@@ -12,9 +12,11 @@ export default function Change_password() {
 
   const handleChangePassword = async () => {
     toast.dismiss();
-    if (newPassword !== confirmPassword) {
-      toast.error("Mật khẩu mới không khớp");
-    }
+
+    if (!confirm("Bạn có chắc là muốn đổi mật khẩu ?")) return;
+
+    if (newPassword !== confirmPassword) toast.error("Mật khẩu mới không khớp");
+
     // gọi api đổi mật khẩu
     const data = await changePassword(
       currentPassword,
