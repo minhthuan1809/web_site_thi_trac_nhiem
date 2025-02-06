@@ -24,10 +24,10 @@ const ModalAddExam = ({
     lecturer: dataEdit ? dataEdit.username : dataUsers?.username || "", // Set default value from dataUsers
     subject: dataEdit ? dataEdit.subject : "",
     exam_day: dataEdit
-      ? new Date(dataEdit.exam_day).toLocaleString('sv-SE').slice(0, 16)
+      ? new Date(dataEdit.exam_day).toLocaleString("sv-SE").slice(0, 16)
       : "",
     day_close: dataEdit
-      ? new Date(dataEdit.day_close).toLocaleString('sv-SE').slice(0, 16)
+      ? new Date(dataEdit.day_close).toLocaleString("sv-SE").slice(0, 16)
       : "",
     point: dataEdit ? dataEdit.point : "10",
     duration: dataEdit ? dataEdit.duration : "30",
@@ -150,7 +150,11 @@ const ModalAddExam = ({
       day_close: formData.day_close,
     };
 
-    getItemExamQuestion(questions, formattedData);
+    getItemExamQuestion(
+      questions,
+      formattedData,
+      dataUsers.information_teacher.mgv
+    );
     onClose();
     setReload(!reload);
   };
@@ -169,7 +173,12 @@ const ModalAddExam = ({
       exam_day: formData.exam_day,
       day_close: formData.day_close,
     };
-    const data = await updateExam(dataEdit.id, formattedData, questions);
+    const data = await updateExam(
+      dataEdit.id,
+      formattedData,
+      questions,
+      dataUsers.information_teacher.mgv
+    );
     if (data.ok) {
       onClose();
       setReload(!reload);
@@ -183,7 +192,8 @@ const ModalAddExam = ({
           <h2 className="text-2xl font-bold text-gray-800">Thêm bài thi mới</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+          >
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -329,7 +339,8 @@ const ModalAddExam = ({
                 <button
                   type="button"
                   onClick={addQuestion}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                  className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                >
                   <Plus className="w-5 h-5" />
                   <span className="font-medium">Thêm câu hỏi</span>
                 </button>
@@ -339,11 +350,13 @@ const ModalAddExam = ({
                 {questions.map((question: any, index: any) => (
                   <div
                     key={index}
-                    className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm relative">
+                    className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm relative"
+                  >
                     <button
                       type="button"
                       onClick={() => removeQuestion(index)}
-                      className="absolute top-4 right-4 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                      className="absolute top-4 right-4 p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                    >
                       <Trash2 className="w-5 h-5" />
                     </button>
 
@@ -475,13 +488,15 @@ const ModalAddExam = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+            className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
             Hủy
           </button>
           <button
             type="submit"
             onClick={!dataEdit ? handleSubmit : handleUpdateExam}
-            className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+            className="px-6 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          >
             {dataEdit ? "Cập nhật" : "Lưu"}
           </button>
         </div>

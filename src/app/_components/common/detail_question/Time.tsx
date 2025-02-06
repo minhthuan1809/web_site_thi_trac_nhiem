@@ -3,7 +3,13 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Clock } from "lucide-react";
 
-export default function Time({_setTime, _time}: {_setTime: (time: number) => void, _time: number}) {
+export default function Time({
+  _setTime,
+  _time,
+}: {
+  _setTime: (time: number | ((prevTime: number) => number)) => void;
+  _time: number;
+}) {
   // Format time into HH:MM:SS or MM:SS
   const formatTime = useCallback((seconds: number) => {
     const hours = Math.floor(seconds / 3600);
@@ -12,27 +18,29 @@ export default function Time({_setTime, _time}: {_setTime: (time: number) => voi
 
     return [
       ...(hours > 0 ? [hours.toString()] : []),
-      minutes.toString().padStart(2, '0'),
-      remainingSeconds.toString().padStart(2, '0')
-    ].join(':');
+      minutes.toString().padStart(2, "0"),
+      remainingSeconds.toString().padStart(2, "0"),
+    ].join(":");
   }, []);
 
   // Handle countdown timer
   useEffect(() => {
-    if (_time < 0) return;
+    if (_time === undefined || _time < 0) return;
 
     const timer = setInterval(() => {
-      const newTime = Math.max(0, _time - 1);
-      _setTime(newTime);
-      
-      if (newTime === 0) {
-        clearInterval(timer);
-        alert("Đã hết thời gian làm bài!");
-      }
+      _setTime((prevTime: any) => {
+        const newTime = Math.max(0, prevTime - 1);
+        sessionStorage.setItem("time_exam", newTime.toString());
+
+        if (newTime === 0) {
+          clearInterval(timer);
+        }
+        return newTime;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [_time, _setTime]);
+  }, [_setTime]);
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4 rounded-lg shadow-lg mb-6">

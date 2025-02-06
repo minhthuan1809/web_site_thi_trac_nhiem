@@ -1,17 +1,17 @@
 // get practice page
-export const getPracticePage = async () => {
+export const getPracticePage = async (page: number, searchTerm: string) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/Practice?populate[0]=exam.image`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/practices?pagination[page]=${page}&pagination[pageSize]=9&filters[subject][$containsi]=${searchTerm}`
   );
   const data = await response.json();
 
   return data;
 };
 
-// get practice detail
-export const getPracticeDetail = async () => {
+// get detail practice
+export const getPracticeDetail = async (id: string) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/practice?populate=exam.question`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/practices/${id}?populate=*`
   );
   const data = await response.json();
   return data;

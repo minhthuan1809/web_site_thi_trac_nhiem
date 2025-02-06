@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Number from "./Number";
 import { Radio, RadioGroup } from "@nextui-org/react";
 import Time from "./Time";
-
+import { questionStore } from "@/app/store";
 // Define interface for exam data
 interface Question {
   id: number;
@@ -34,24 +34,30 @@ interface DetailPracticeProps {
   runtime?: number;
 }
 
-const Detail_Practice: React.FC<DetailPracticeProps> = ({
-  data,
-  runtime,
-}) => {
+const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
+  const { setQuestion } = questionStore();
   const [numberQuestion, setNumberQuestion] = useState(1);
-  const [_time, _setTime] = useState<number>(runtime || 900); // default 15 mins
+  const [_time, _setTime] = useState<number>(() => {
+    const savedTime = sessionStorage.getItem("time_exam");
+    if (savedTime) {
+      return parseInt(savedTime);
+    }
+    return runtime || 900;
+  });
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: string;
   }>(JSON.parse(sessionStorage.getItem("selectedAnswers") || "{}"));
 
-  // Update _time when runtime changes
   useEffect(() => {
-    
-    if (runtime) {
+    if (!sessionStorage.getItem("time_exam") && runtime) {
       _setTime(runtime);
-      
+      sessionStorage.setItem("time_exam", runtime.toString());
     }
   }, [runtime]);
+
+  useEffect(() => {
+    setQuestion(data);
+  }, [data]);
 
   const questions = data?.question || [];
   const currentQuestion = questions[numberQuestion - 1] || {};
@@ -72,19 +78,10 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({
     );
   };
 
-  const handleTimeUp = () => {
-    // Xử lý khi hết thời gian
-    if (Object.keys(selectedAnswers).length > 0) {
-      // TODO: Thêm logic nộp bài thi ở đây
-      alert("Đã hết thời gian làm bài!");
-    }
-  };
-
   return (
     <div className="container mx-auto p-4 h-screen pt-[10rem]">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-3/4">
-        
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-2xl font-bold mb-4">
               Câu hỏi {numberQuestion}
@@ -138,7 +135,12 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({
         <div className="lg:w-1/4">
           <div className="bg-white rounded-lg shadow-md p-6">
             <Time _setTime={_setTime} _time={_time} />
-            <Number data={questions} question={numberQuestion} setQuestion={setNumberQuestion}/>
+            <Number
+              data={questions}
+              question={numberQuestion}
+              setQuestion={setNumberQuestion}
+              _time={_time}
+            />
           </div>
         </div>
       </div>

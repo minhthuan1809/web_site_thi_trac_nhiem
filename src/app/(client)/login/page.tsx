@@ -31,7 +31,6 @@ export default function PageLogin() {
     e.preventDefault();
     toast.dismiss();
     const data = await requestLogin(email, password);
-    console.log(data);
 
     if (data.error) {
       toast.error(

@@ -1,68 +1,66 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   Input,
   Card,
   CardBody,
   CardFooter,
   Button,
-  Pagination,
+  Chip,
 } from "@nextui-org/react";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, BookOpenIcon } from "lucide-react";
 import { getPracticePage } from "@/app/service/practice_api";
-import Loading from "@/app/_components/common/Loading";
+import NextPagination from "@/app/_components/ui/Pagination";
+
+interface Subject {
+  id: number;
+  subject: string;
+  duration: number;
+  point: number;
+  documentId: string;
+  status_exam: boolean;
+}
 
 export default function PracticePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(1);
-  const [practicePage, setPracticePage] = useState<any[]>([]); // Initialize as empty array
+  const [practicePage, setPracticePage] = useState<Subject[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
 
-  const filteredSubjects =
-    practicePage?.filter((subject: any) =>
-      subject.content.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-
-  const handleSubjectClick = (subject: any, count: number) => {
-    const formattedName = subject.title
+  const handleClick = (subject: Subject, documentId: string) => {
+    const formattedName = subject.subject
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[đĐ]/g, "d")
       .replace(/\s+/g, "_")
-      .toLowerCase(); // Chuyển tất cả thành chữ thường
-    router.push(`/practice/${formattedName}/${++count}`);
+      .toLowerCase();
+    router.push(`/practice/${formattedName}/${documentId}`);
   };
 
   useEffect(() => {
+    sessionStorage.removeItem("selectedAnswers");
+    sessionStorage.removeItem("time_exam");
     const fetchData = async () => {
       try {
-        setIsLoading(true);
-        const data = await getPracticePage();
-        setPracticePage(data.data.exam);
-        console.log(data);
+        const response = await getPracticePage(page, searchTerm);
+
+        setPracticePage(response.data);
+        setTotalPages(response.meta.pagination.pageCount);
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error fetching practice page:", error);
       } finally {
-        setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
-
-  if (isLoading) {
-    return <Loading />;
-  }
-
+  }, [page, searchTerm]);
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white mt-[5rem]">
-      <div className="container mx-auto px-4 py-16">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
+    <div className="min-h-screen bg-gradient-to-br pt-[10rem] from-blue-50 to-white py-16">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 mb-4">
-            Luyện Thi Đại Học
+            Luyện Thi Thử
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Kho đề thi và bài tập các môn học bậc đại học được biên soạn bởi các
@@ -70,86 +68,77 @@ export default function PracticePage() {
           </p>
         </div>
 
-        {/* Search Section */}
-        <div className="max-w-2xl mx-auto mb-16">
+        <div className="max-w-2xl mx-auto mb-12">
           <Input
+            isClearable
             type="text"
             placeholder="Tìm kiếm môn học..."
+            startContent={<SearchIcon className="text-default-400" />}
             value={searchTerm}
+            onClear={() => setSearchTerm("")}
             onChange={(e) => setSearchTerm(e.target.value)}
-            startContent={<SearchIcon className="text-gray-400" size={20} />}
+            classNames={{
+              inputWrapper: "shadow-md hover:shadow-lg transition-shadow",
+            }}
             size="lg"
-            radius="lg"
-            classNames={{
-              input: "text-lg",
-              inputWrapper: "shadow-lg",
-            }}
           />
         </div>
 
-        {/* Subjects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredSubjects.map((subject: any, index: number) => {
-            if (subject.status_try) return null;
-            return (
-              <Card
-                key={subject.id}
-                className="border-none shadow-md hover:shadow-xl transition-shadow"
-              >
-                <CardBody className="p-0">
-                  <div className="relative w-full h-48">
-                    <Image
-                      src={
-                        subject.image?.url
-                          ? `${process.env.NEXT_PUBLIC_API_URL}${subject.image.url}`
-                          : "/default-image.jpg"
-                      }
-                      alt={subject.name || "Subject image"}
-                      fill
-                      className="object-cover rounded-t-xl"
-                      onError={(e: any) => {
-                        e.target.src = "/default-image.jpg";
-                      }}
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-                      {subject.title}
-                    </h2>
-                    <p className="text-gray-600">{subject.content}</p>
-                  </div>
-                </CardBody>
-                <CardFooter className="px-6 pb-6 pt-0">
-                  <Button
-                    color="primary"
-                    radius="lg"
-                    className="w-full"
-                    size="lg"
-                    onClick={() => handleSubjectClick(subject, index)}
+        {practicePage.length === 0 ? (
+          <div className="text-center text-gray-500">không có dữ liệu</div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {practicePage.map((subject, index) => {
+                if (subject.status_exam) return;
+                return (
+                  <Card
+                    key={index}
+                    isPressable
+                    className="border-none shadow-md hover:shadow-xl transition-shadow"
                   >
-                    Làm thử
-                  </Button>
-                </CardFooter>
-              </Card>
-            );
-          })}
-        </div>
+                    <CardBody className="p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-primary">
+                          {subject.subject}
+                        </h2>
+                        <BookOpenIcon className="text-default-400" />
+                      </div>
+                      <div className="space-y-2">
+                        <Chip color="primary" variant="light" size="sm">
+                          Thời gian: {subject.duration} phút
+                        </Chip>
+                        <Chip color="secondary" variant="light" size="sm">
+                          Điểm tối đa: {subject.point} điểm
+                        </Chip>
+                      </div>
+                    </CardBody>
+                    <CardFooter>
+                      <Button
+                        fullWidth
+                        color="primary"
+                        variant="solid"
+                        onPress={() =>
+                          handleClick(subject, subject?.documentId)
+                        }
+                      >
+                        Làm thử
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
+            </div>
 
-        {/* Pagination */}
-        <div className="flex justify-center mt-16">
-          <Pagination
-            total={10}
-            page={page}
-            onChange={setPage}
-            showControls
-            color="primary"
-            radius="lg"
-            classNames={{
-              wrapper: "gap-2",
-              item: "w-10 h-10",
-            }}
-          />
-        </div>
+            <div className="flex justify-center mt-12">
+              <NextPagination
+                total={totalPages}
+                setPage={setPage}
+                page={page}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

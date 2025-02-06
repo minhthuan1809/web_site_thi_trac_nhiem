@@ -16,7 +16,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { getItemExam } from "@/app/service/exams_api";
 import { useStore } from "@/app/store";
-import {  useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 export default function ExamPage() {
   const [exams, setExams] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,39 +25,50 @@ export default function ExamPage() {
   const router = useRouter();
 
   useEffect(() => {
+    sessionStorage.removeItem("selectedAnswers");
+    sessionStorage.removeItem("time_exam");
     const fetchData = async () => {
       const data = await getItemExam();
-      const examData = data?.data.map((exam: any) => {
-        const now = new Date();
-        const examDate = new Date(exam.exam_day);
-        const closeDate = new Date(exam.day_close);
-        let status = "closed";
-        if (now < examDate) {
-          status = "upcoming";
-        } else if (now >= examDate && now <= closeDate) {
-          status = "open";
-        }
-        // Nếu là sinh viên, chỉ lấy bài thi của lớp đó
-        if (dataUsers.role_user === "students" && exam.class.trim().toLowerCase() === dataUsers.information_user.class.trim().toLowerCase()) {
-          return {
-            ...exam,
-            status_exam: status,
-          };
-        }
-        
-        return null;
-      }).filter(Boolean) || [];
-      
+
+      const examData =
+        data?.data
+          .map((exam: any) => {
+            const now = new Date();
+            const examDate = new Date(exam.exam_day);
+            const closeDate = new Date(exam.day_close);
+            let status = "closed";
+            if (now < examDate) {
+              status = "upcoming";
+            } else if (now >= examDate && now <= closeDate) {
+              status = "open";
+            }
+            // Nếu là sinh viên, chỉ lấy bài thi của lớp đó
+            if (
+              dataUsers.role_user === "students" &&
+              exam.class.trim().toLowerCase() ===
+                dataUsers.information_user.class.trim().toLowerCase()
+            ) {
+              return {
+                ...exam,
+                status_exam: status,
+              };
+            }
+
+            return null;
+          })
+          .filter(Boolean) || [];
+
       setExams(examData);
     };
     fetchData();
   }, [dataUsers]);
 
-  const filteredExams = exams?.filter((exam) =>
-    Object.values(exam).some((value) =>
-      value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  ) || [];
+  const filteredExams =
+    exams?.filter((exam) =>
+      Object.values(exam).some((value) =>
+        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    ) || [];
 
   const columns = [
     { name: "STT", uid: "documentId" },
@@ -88,22 +99,21 @@ export default function ExamPage() {
   const handleStartExam = (examId: any, subject: string) => {
     // xử lý logic với examId và subject
     const formattedName = subject
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[đĐ]/g, "d")
-    .replace(/\s+/g, "_")
-    .toLowerCase(); 
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[đĐ]/g, "d")
+      .replace(/\s+/g, "_")
+      .toLowerCase();
     router.push(`/exam/${formattedName}/${examId}`);
-    
   };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -124,10 +134,12 @@ export default function ExamPage() {
             </div>
             <div className="flex items-center gap-2">
               <Chip color="success" variant="shadow">
-                Đang mở: {exams?.filter((e) => e.status_exam === "open").length || 0}
+                Đang mở:{" "}
+                {exams?.filter((e) => e.status_exam === "open").length || 0}
               </Chip>
               <Chip color="warning" variant="shadow">
-                Sắp diễn ra: {exams?.filter((e) => e.status_exam === "upcoming").length || 0}
+                Sắp diễn ra:{" "}
+                {exams?.filter((e) => e.status_exam === "upcoming").length || 0}
               </Chip>
             </div>
           </div>
@@ -194,8 +206,11 @@ export default function ExamPage() {
                       variant="flat"
                       size="sm"
                     >
-                      {item.status_exam === "open" ? "Đang mở" : 
-                       item.status_exam === "upcoming" ? "Sắp diễn ra" : "Đã đóng"}
+                      {item.status_exam === "open"
+                        ? "Đang mở"
+                        : item.status_exam === "upcoming"
+                        ? "Sắp diễn ra"
+                        : "Đã đóng"}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -212,7 +227,9 @@ export default function ExamPage() {
                         }
                         variant="flat"
                         size="sm"
-                        onClick={() => handleStartExam(item.id, item.subject)}
+                        onClick={() =>
+                          handleStartExam(item.documentId, item.subject)
+                        }
                         disabled={item.status_exam !== "open"}
                       >
                         {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}

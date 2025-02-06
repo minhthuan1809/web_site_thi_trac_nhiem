@@ -23,7 +23,6 @@ export default function NavBar() {
   const router = useRouter();
   const { dataUsers, setDataUsers } = useStore();
 
-
   useEffect(() => {
     const fetchData = async () => {
       const data = await getLogo();
@@ -54,6 +53,7 @@ export default function NavBar() {
       deleteCookie("jwt");
       router.push("/login");
       setDataUsers([]);
+      sessionStorage.removeItem("selectedAnswers");
     }
   };
 
@@ -63,7 +63,13 @@ export default function NavBar() {
         <div className="mx-auto px-4">
           <div className="flex w-[95%] mx-auto justify-around items-center h-20">
             <div className="w-40 overflow-hidden h-[60%] rounded-md">
-              <Link href="/" className="w-full h-full">
+              <Link
+                href="/"
+                className="w-full h-full"
+                onClick={() => {
+                  sessionStorage.removeItem("selectedAnswers");
+                }}
+              >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
                   alt="logo"
@@ -86,6 +92,10 @@ export default function NavBar() {
                       ? "text-blue-500"
                       : "text-gray-500"
                   } hover:text-blue-500 transition-colors duration-300 text-lg`}
+                  onClick={() => {
+                    item.url === "/" &&
+                      sessionStorage.removeItem("selectedAnswers");
+                  }}
                 >
                   {item.title}
                 </Link>
@@ -134,6 +144,13 @@ export default function NavBar() {
                       >
                         <Icon icon="BookOpenCheck" className="w-5 h-5" />
                         <span className="font-medium">Thêm bài thi</span>
+                      </Link>
+                      <Link
+                        href="/history_exam"
+                        className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
+                      >
+                        <Icon icon="FileClock" className="w-5 h-5" />
+                        <span className="font-medium">lịch sử bài thi</span>
                       </Link>
                     </>
                   )}

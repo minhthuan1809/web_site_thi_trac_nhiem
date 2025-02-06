@@ -1,35 +1,73 @@
-import React, { useEffect } from "react";
+"use client";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { questionStore, useStore } from "@/app/store";
+import { getHistory } from "@/app/service/history_api";
+import { toast } from "react-toastify";
 
 export default function Number({
   question,
   setQuestion,
   data,
+  _time,
 }: {
   question: number;
   setQuestion: (question: number) => void;
   data: any;
+  _time: number;
 }) {
-  const answered = JSON.parse(
-    sessionStorage.getItem("selectedAnswers") || "{}"
-  );
-  useEffect(() => {
-    sessionStorage.removeItem("selectedAnswers");
-  }, []);
+  const { dataQuestion } = questionStore();
+  const { dataUsers } = useStore();
+  const [answered, setAnswered] = useState<any>({});
+  const router = useRouter();
+  const params = useParams();
 
+  useEffect(() => {
+    const savedAnswers = sessionStorage.getItem("selectedAnswers");
+    if (savedAnswers) {
+      setAnswered(JSON.parse(savedAnswers));
+    }
+  }, [sessionStorage.getItem("selectedAnswers")]);
+
+  // nộp bài khi hết thời gian
+  useEffect(() => {
+    if (_time === 0) {
+      alert("Bạn đã hết thời gian làm bài");
+      requestSubmit();
+    }
+  }, [_time]);
+
+  // nộp bài
   const handleSubmit = () => {
     if (Object.keys(answered).length !== data.length) {
       alert("Vui lòng trả lời tất cả câu hỏi");
       return;
     }
-    console.log(Object.keys(answered).length);
-    console.log(answered);
-    
+
     if (confirm("Bạn có chắc chắn muốn nộp bài?")) {
-      // TODO: Thêm logic nộp bài thi ở đây
-      alert("Đã nộp bài thành công!");
+      requestSubmit();
+    }
+  };
+  // xử lý gửi api nộp bài
+  const requestSubmit = async () => {
+    toast.dismiss();
+    sessionStorage.removeItem("time_exam");
+    const selectedAnswers = data.map((item: any) => {
+      return {
+        questions: item.question,
+        results: item.results,
+        answer_user: answered[item.id],
+      };
+    });
+    const result = await getHistory(dataUsers, dataQuestion, selectedAnswers);
+    if (result.error) {
+      toast.error("Đã có lỗi xảy ra !");
+    } else {
+      router.replace(`/results/exam/${params.slug?.[0]}/${params.slug?.[1]}`);
     }
   };
 
+  // hiện thị các câu hỏi
   return (
     <>
       <div className="grid grid-cols-6 gap-2">
