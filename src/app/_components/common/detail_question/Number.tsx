@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 export default function Number({
   question,
@@ -12,11 +12,21 @@ export default function Number({
   const answered = JSON.parse(
     sessionStorage.getItem("selectedAnswers") || "{}"
   );
+  useEffect(() => {
+    sessionStorage.removeItem("selectedAnswers");
+  }, []);
 
-  // xử lý sự kiện nộp bài
   const handleSubmit = () => {
     if (Object.keys(answered).length !== data.length) {
-      confirm("Vui lòng trả lời tất cả câu hỏi");
+      alert("Vui lòng trả lời tất cả câu hỏi");
+      return;
+    }
+    console.log(Object.keys(answered).length);
+    console.log(answered);
+    
+    if (confirm("Bạn có chắc chắn muốn nộp bài?")) {
+      // TODO: Thêm logic nộp bài thi ở đây
+      alert("Đã nộp bài thành công!");
     }
   };
 

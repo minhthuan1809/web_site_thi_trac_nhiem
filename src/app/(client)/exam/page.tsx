@@ -16,11 +16,13 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { getItemExam } from "@/app/service/exams_api";
 import { useStore } from "@/app/store";
+import {  useRouter } from "next/navigation";
 export default function ExamPage() {
   const [exams, setExams] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   let count = 0;
   const { dataUsers } = useStore();
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,10 +85,17 @@ export default function ExamPage() {
     }
   };
 
-  const handleStartExam = (examId: any) => {
-    console.log("Bắt đầu bài thi:", examId);
+  const handleStartExam = (examId: any, subject: string) => {
+    // xử lý logic với examId và subject
+    const formattedName = subject
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .replace(/\s+/g, "_")
+    .toLowerCase(); 
+    router.push(`/exam/${formattedName}/${examId}`);
+    
   };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('vi-VN', {
@@ -99,8 +108,7 @@ export default function ExamPage() {
   };
 
   const formatDuration = (seconds: string) => {
-    const minutes = Math.floor(parseInt(seconds) / 60);
-    return `${minutes} phút`;
+    return `${seconds} phút`;
   };
 
   return (
@@ -204,7 +212,7 @@ export default function ExamPage() {
                         }
                         variant="flat"
                         size="sm"
-                        onClick={() => handleStartExam(item.documentId)}
+                        onClick={() => handleStartExam(item.id, item.subject)}
                         disabled={item.status_exam !== "open"}
                       >
                         {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}

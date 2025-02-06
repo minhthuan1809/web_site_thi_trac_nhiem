@@ -4,45 +4,56 @@ import Number from "./Number";
 import { Radio, RadioGroup } from "@nextui-org/react";
 import Time from "./Time";
 
-// Định nghĩa interface cho props
+// Define interface for exam data
+interface Question {
+  id: number;
+  question: string;
+  answerA: string;
+  answerB: string;
+  answerC: string;
+  answerD: string;
+  results: string;
+}
+
+interface ExamData {
+  id: number;
+  subject: string;
+  class: string;
+  lecturer: string;
+  exam_day: string;
+  day_close: string;
+  duration: string;
+  point: string;
+  status_exam: boolean;
+  see_exam_results: boolean;
+  question: Question[];
+}
+
 interface DetailPracticeProps {
-  params: {
-    slug: string[];
-  };
-  data: any;
+  data: ExamData | null;
   runtime?: number;
 }
 
-export default function Detail_Practice({
-  params,
+const Detail_Practice: React.FC<DetailPracticeProps> = ({
   data,
   runtime,
-}: DetailPracticeProps) {
+}) => {
   const [numberQuestion, setNumberQuestion] = useState(1);
-  const [_time, _setTime] = useState<number>(runtime || 900); // mặc định là 15p
+  const [_time, _setTime] = useState<number>(runtime || 900); // default 15 mins
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: number]: string;
-  }>(JSON.parse(localStorage.getItem("selectedAnswers") || "{}"));
+  }>(JSON.parse(sessionStorage.getItem("selectedAnswers") || "{}"));
 
-  // Cập nhật giá trị _time khi runtime thay đổi
+  // Update _time when runtime changes
   useEffect(() => {
+    
     if (runtime) {
       _setTime(runtime);
+      
     }
   }, [runtime]);
 
-  // Tìm exam có title khớp với slug[0] sau khi chuẩn hóa
-  const matchingExam = data.find((exam: any) => {
-    const normalizedTitle = exam.title
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[đĐ]/g, "d")
-      .replace(/\s+/g, "_")
-      .toLowerCase();
-    return normalizedTitle === params.slug[0];
-  });
-
-  const questions = matchingExam?.question || [];
+  const questions = data?.question || [];
   const currentQuestion = questions[numberQuestion - 1] || {};
 
   const handleAnswerChange = (value: string) => {
@@ -51,7 +62,7 @@ export default function Detail_Practice({
       [currentQuestion.id]: value,
     }));
 
-    // Lưu vào sessionStorage
+    // Save to sessionStorage
     sessionStorage.setItem(
       "selectedAnswers",
       JSON.stringify({
@@ -61,10 +72,19 @@ export default function Detail_Practice({
     );
   };
 
+  const handleTimeUp = () => {
+    // Xử lý khi hết thời gian
+    if (Object.keys(selectedAnswers).length > 0) {
+      // TODO: Thêm logic nộp bài thi ở đây
+      alert("Đã hết thời gian làm bài!");
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4 h-screen">
+    <div className="container mx-auto p-4 h-screen pt-[10rem]">
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-3/4">
+        
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-2xl font-bold mb-4">
               Câu hỏi {numberQuestion}
@@ -117,18 +137,13 @@ export default function Detail_Practice({
         </div>
         <div className="lg:w-1/4">
           <div className="bg-white rounded-lg shadow-md p-6">
-            {/* thời gian */}
-            <Time value={_time} _setTime={_setTime} />
-            <h3 className="text-xl font-semibold mb-4">Danh sách câu hỏi</h3>
-            {/* số lượng câu hỏi */}
-            <Number
-              question={numberQuestion}
-              setQuestion={setNumberQuestion}
-              data={questions}
-            />
+            <Time _setTime={_setTime} _time={_time} />
+            <Number data={questions} question={numberQuestion} setQuestion={setNumberQuestion}/>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default Detail_Practice;

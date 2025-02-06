@@ -15,7 +15,7 @@ import { Chip } from "@nextui-org/chip";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { getItemExam } from "@/app/service/exams_api";
 import Modal_add_exam from "./Modal_add_exam";
-import { deleteExam } from "@/app/service/examquestion";
+import { deleteExam, getDetailExam } from "@/app/service/examquestion";
 import { useStore } from "@/app/store";
 
 
@@ -29,6 +29,7 @@ export default function ExamPage() {
   const [isOpenModalCreate, setIsOpenModalCreate] = useState(false);
   const onOpenChangeCreate = () => setIsOpenModalCreate(!isOpenModalCreate);
   const [reload, setReload] = useState(false);
+  const [dataEdit, setDataEdit] = useState<any>(null);
 
   const { dataUsers } = useStore();
   // lấy dữ liệu
@@ -48,6 +49,8 @@ export default function ExamPage() {
         } else if (now >= examDate && now <= closeDate) {
           status = "open";
         }
+
+
 
         // Nếu là giảng viên, chỉ lấy bài thi của giảng viên đó
         if (dataUsers.role_user === "lecturer" && exam.lecturer === dataUsers.username) {
@@ -100,9 +103,7 @@ export default function ExamPage() {
     }
   };
 
-  // const handleStartExam = (examId: any) => {
-  //   console.log("Bắt đầu bài thi:", examId);
-  // };
+
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -112,12 +113,12 @@ export default function ExamPage() {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
+      hour12: false // Chuyển về định dạng 24 giờ
     });
   };
 
   const formatDuration = (seconds: string) => {
-    const minutes = Math.floor(parseInt(seconds) / 60);
-    return `${minutes} phút`;
+    return `${seconds} phút`;
   };
 
 
@@ -125,6 +126,12 @@ export default function ExamPage() {
     if (!confirm("Bạn có chắc chắn muốn xóa bài thi này không?")) return;
     deleteExam(id);
     setReload(prev => !prev);
+  };
+
+  const handleEditExam = async (id: any) => {
+    const data = await getDetailExam(id);
+    setIsOpenModalCreate(true);
+    setDataEdit(data.data);
   };
 
   return (
@@ -238,6 +245,7 @@ export default function ExamPage() {
                       variant="flat"
                       size="sm"
                       className="bg-blue-500 text-white"
+                      onClick={() => handleEditExam(item.id)}
                     >
                       Sửa
                     </Button>
@@ -254,6 +262,8 @@ export default function ExamPage() {
         onClose={onOpenChangeCreate}
         setReload={setReload}
         reload={reload}
+        dataEdit={dataEdit}
+        setDataEdit={setDataEdit}
         />
       )}
     </div>
