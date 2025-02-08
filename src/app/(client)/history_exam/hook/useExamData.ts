@@ -28,16 +28,29 @@ export function useExamData(dataUsers: any): ExamData {
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalPages, setTotalPages] = useState(1);
-  const [dateRange, setDateRange] = useState(() => {
-    const savedRange = localStorage.getItem("examDateRange");
-    if (savedRange) {
-      return JSON.parse(savedRange);
+  const [dateRange, setDateRange] = useState<{ start: string; end: string }>(
+    () => {
+      // Giá trị mặc định
+      const defaultRange = {
+        start: new Date().toISOString().split("T")[0],
+        end: new Date().toISOString().split("T")[0],
+      };
+
+      // Chỉ truy cập localStorage ở phía client
+      if (typeof window !== "undefined") {
+        try {
+          const savedRange = localStorage.getItem("examDateRange");
+          if (savedRange) {
+            return JSON.parse(savedRange);
+          }
+        } catch (error) {
+          console.error("Error reading from localStorage:", error);
+        }
+      }
+
+      return defaultRange;
     }
-    return {
-      start: new Date().toISOString().split("T")[0],
-      end: new Date().toISOString().split("T")[0],
-    };
-  });
+  );
 
   // Calculate points based on answers
   const calculatePoints = (answers: Answer[]) => {
@@ -108,7 +121,14 @@ export function useExamData(dataUsers: any): ExamData {
     };
 
     setDateRange(formattedRange);
-    localStorage.setItem("examDateRange", JSON.stringify(formattedRange));
+    // Chỉ lưu vào localStorage ở phía client
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("examDateRange", JSON.stringify(formattedRange));
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
+    }
   };
 
   return {

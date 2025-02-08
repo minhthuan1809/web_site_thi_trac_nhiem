@@ -1,4 +1,3 @@
-// src/app/(client)/history_exam/page.tsx
 "use client";
 import React, { useState } from "react";
 import { useStore } from "@/app/store";
