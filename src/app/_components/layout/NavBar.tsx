@@ -23,6 +23,7 @@ export default function NavBar() {
   const router = useRouter();
   const { dataUsers, setDataUsers } = useStore();
   const { dataRefresh } = refreshStore();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const fetchData = async () => {
     const data = await getLogo();
@@ -33,19 +34,16 @@ export default function NavBar() {
     setBtnNav(dataNavBtn.data.navbar.btn_nav);
   };
 
-  // thực hiện khi có sự thay đổi trong dataRefresh
   useEffect(() => {
     fetchData();
     const fetchDataUser = async () => {
       const dataUserInfo = await getUserInfo();
       if (dataUserInfo.error) {
-        // kiểm tra tk bị khóa
         toast.dismiss();
         router.push("/login");
         deleteCookie("jwt");
         toast.info("bạn cần đăng nhập lại !");
       }
-      // thêm dữ liệu vào store
       setDataUsers(dataUserInfo);
     };
     if (getCookie("jwt")) {
@@ -66,7 +64,8 @@ export default function NavBar() {
     <>
       <nav className="bg-white h-auto shadow-lg fixed top-0 left-0 right-0 z-50">
         <div className="mx-auto px-4">
-          <div className="flex w-[95%] mx-auto justify-around items-center h-20">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex w-[95%] mx-auto justify-around items-center h-20">
             <div className="w-40 overflow-hidden h-[60%] rounded-md">
               <Link
                 href="/"
@@ -128,7 +127,6 @@ export default function NavBar() {
                     <Icon icon="UserIcon" className="w-5 h-5" />
                     <span className="font-medium">Thông tin cá nhân</span>
                   </Link>
-                  {/* hiện thị mục dành cho sinh viên */}
                   {dataUsers?.role_user === "students" && (
                     <>
                       <Link
@@ -140,7 +138,6 @@ export default function NavBar() {
                       </Link>
                     </>
                   )}
-                  {/* /// hiện thị mục dành cho giáo viên */}
                   {dataUsers?.role_user === "lecturer" && (
                     <>
                       {[
@@ -196,6 +193,157 @@ export default function NavBar() {
               </div>
             )}
           </div>
+
+          {/* Mobile Navigation */}
+          <div className="lg:hidden flex justify-between items-center h-20">
+            <div className="w-32 overflow-hidden h-[60%] rounded-md">
+              <Link href="/" className="w-full h-full">
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
+                  alt="logo"
+                  width={150}
+                  height={150}
+                  className="w-full h-full"
+                  priority
+                />
+              </Link>
+            </div>
+
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
+              <Icon icon={isMenuOpen ? "X" : "Menu"} className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Mobile Menu */}
+          {isMenuOpen && (
+            <div className="lg:hidden bg-white border-t py-4">
+              <div>
+                {items.map((item, index) => (
+                  <Link
+                    href={item.url}
+                    key={index}
+                    target={item.target}
+                    className={`block px-4 py-2.5 text-center text-lg font-medium transition-colors duration-200 ${
+                      (pathname.includes(item.url) && item.url !== "/") ||
+                      (pathname === "/" && item.url === "/")
+                        ? "text-blue-600 bg-blue-50 rounded-lg"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg"
+                    }`}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      item.url === "/" &&
+                        sessionStorage.removeItem("selectedAnswers");
+                    }}
+                  >
+                    {item.title}
+                  </Link>
+                ))}
+
+                {getCookie("jwt") ? (
+                  <div className="border-t pt-4 mt-4">
+                    <div className="px-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="border text-xl flex justify-center items-center w-10 h-10 border-2 border-black bg-blue-800 text-white rounded-full">
+                          <span>
+                            {dataUsers?.username?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium">{dataUsers?.username}</p>
+                          <p className="text-sm text-gray-500">
+                            {dataUsers?.email}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link
+                      href="/settings"
+                      className="block px-4 py-2 text-gray-800"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon icon="UserIcon" className="w-5 h-5" />
+                        <span>Thông tin cá nhân</span>
+                      </div>
+                    </Link>
+
+                    {dataUsers?.role_user === "students" && (
+                      <Link
+                        href="/exam"
+                        className="block px-4 py-2 text-gray-800"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Icon icon="BookOpenCheck" className="w-5 h-5" />
+                          <span>Bài thi</span>
+                        </div>
+                      </Link>
+                    )}
+
+                    {dataUsers?.role_user === "lecturer" && (
+                      <>
+                        {[
+                          {
+                            href: "/add_practice",
+                            icon: "CirclePlus",
+                            content: "Thêm bài thi thử",
+                          },
+                          {
+                            href: "/add_exam",
+                            icon: "BookOpenCheck",
+                            content: "Thêm bài thi",
+                          },
+                          {
+                            href: "/history_exam",
+                            icon: "FileClock",
+                            content: "Lịch sử bài thi",
+                          },
+                        ].map((item, index) => (
+                          <Link
+                            key={index}
+                            href={item.href}
+                            className="block px-4 py-2 text-gray-800"
+                            onClick={() => setIsMenuOpen(false)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <Icon icon={item.icon} className="w-5 h-5" />
+                              <span>{item.content}</span>
+                            </div>
+                          </Link>
+                        ))}
+                      </>
+                    )}
+
+                    <button
+                      className="w-full text-left px-4 py-2 text-red-600"
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <Icon icon="LogOut" className="w-5 h-5" />
+                        <span>Đăng xuất</span>
+                      </div>
+                    </button>
+                  </div>
+                ) : (
+                  <div className="border-t pt-4 mt-4 px-4 space-y-2">
+                    {btnNav.map((item, index) => (
+                      <Link
+                        href={item.url}
+                        key={index}
+                        target={item.target}
+                        className="block px-4 py-2 rounded-lg bg-blue-500 text-white text-center hover:bg-blue-600 transition-colors duration-200"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        {item.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
     </>
