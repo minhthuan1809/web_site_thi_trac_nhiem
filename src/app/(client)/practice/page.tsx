@@ -135,6 +135,7 @@ export default function PracticePage() {
                 total={totalPages}
                 setPage={setPage}
                 page={page}
+                url="/practice"
               />
             </div>
           </>

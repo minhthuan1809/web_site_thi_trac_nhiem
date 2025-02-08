@@ -9,12 +9,14 @@ import { deleteCookie, getCookie, setCookie } from "cookies-next";
 // import thư viện từ bên trong
 import Input from "@/app/_components/common/Input";
 import { requestLogin } from "@/app/service/login_api";
+import { refreshStore } from "@/app/store";
 
 // vần xử lý code
 export default function PageLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { setRefresh } = refreshStore();
 
   // kiểm tra xem có token không
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function PageLogin() {
       });
       router.push("/");
       toast.success("Đăng nhập thành công");
+      setRefresh((prev: boolean) => !prev);
     } else {
       toast.error("Đăng nhập thất bại");
     }

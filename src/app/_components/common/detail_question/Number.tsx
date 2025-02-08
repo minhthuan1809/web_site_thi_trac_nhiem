@@ -1,9 +1,9 @@
 "use client";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { questionStore, useStore } from "@/app/store";
-import { getHistory } from "@/app/service/history_api";
 import { toast } from "react-toastify";
+import { setHistoryExam } from "@/app/service/history_api";
 
 export default function Number({
   question,
@@ -21,7 +21,7 @@ export default function Number({
   const [answered, setAnswered] = useState<any>({});
   const router = useRouter();
   const params = useParams();
-
+  const pathname = usePathname();
   useEffect(() => {
     const savedAnswers = sessionStorage.getItem("selectedAnswers");
     if (savedAnswers) {
@@ -52,18 +52,37 @@ export default function Number({
   const requestSubmit = async () => {
     toast.dismiss();
     sessionStorage.removeItem("time_exam");
-    const selectedAnswers = data.map((item: any) => {
-      return {
-        questions: item.question,
-        results: item.results,
-        answer_user: answered[item.id],
-      };
-    });
-    const result = await getHistory(dataUsers, dataQuestion, selectedAnswers);
-    if (result.error) {
-      toast.error("Đã có lỗi xảy ra !");
+
+    if (pathname.split("/")[1] === "exam") {
+      const selectedAnswers = data.map((item: any) => {
+        return {
+          questions: item.question,
+          results: item.results,
+          answer_user: answered[item.id],
+        };
+      });
+      const result = await setHistoryExam(
+        dataUsers,
+        dataQuestion,
+        selectedAnswers
+      );
+      if (result.error) {
+        toast.error("Đã có lỗi xảy ra !");
+      } else {
+        router.replace(
+          `/results/${pathname.split("/")[1]}/${params.slug?.[0]}/${
+            params.slug?.[1]
+          }`
+        );
+      }
+    } else if (pathname.split("/")[1] === "practice") {
+      router.replace(
+        `/results/${pathname.split("/")[1]}/${params.slug?.[0]}/${
+          params.slug?.[1]
+        }`
+      );
     } else {
-      router.replace(`/results/exam/${params.slug?.[0]}/${params.slug?.[1]}`);
+      toast.error("Đã có lỗi xảy ra !");
     }
   };
 

@@ -1,12 +1,10 @@
-// đổi mật khẩu
-export const getHistory = async (
+//  lưu lại lịch sử thi
+export const setHistoryExam = async (
   dataUsers: any,
   dataQuestion: any,
   selectedAnswers: any
 ) => {
   try {
-    console.log(dataQuestion);
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/history-exam`,
       {
@@ -24,15 +22,34 @@ export const getHistory = async (
             namelecturer: dataQuestion.lecturer,
             mgv: dataQuestion.magv,
             answer: selectedAnswers,
+            duration: dataQuestion.duration,
+            exam_day: new Date().toISOString(),
+            point: dataQuestion.point,
           },
         }),
       }
     );
-    console.log(dataQuestion.subject);
 
     const data = await response.json();
     return data;
+  } catch (error) {}
+};
+
+// lấy lịch sử thi
+export const getHistoryExam = async (
+  page: number,
+  searchTerm: string,
+  mgv: any
+) => {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/history-exam?populate=*&pagination[page]=${page}&pagination[pageSize]=20&filters[$or][0][subject][$containsi]=${searchTerm}&filters[$or][1][msv][$containsi]=${searchTerm}&filters[$or][2][username][$containsi]=${searchTerm}&filters[$or][3][class][$containsi]=${searchTerm}&filters[$or][4][namelecturer][$containsi]=${searchTerm}&filters[mgv][$containsi]=${mgv}`
+    );
+    const data = await response.json();
+
+    return data;
   } catch (error) {
-    console.log(error);
+    console.error("Lỗi khi lấy lịch sử thi:", error);
+    throw error;
   }
 };

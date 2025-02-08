@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -18,10 +18,7 @@ import Modal_add_exam from "./Modal_add_exam";
 import { deleteExam, getDetailExam } from "@/app/service/examquestion";
 import { useStore } from "@/app/store";
 
-
-
 export default function ExamPage() {
-
   // khai báo biến
   const [exams, setExams] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,13 +29,15 @@ export default function ExamPage() {
   const [dataEdit, setDataEdit] = useState<any>(null);
 
   const { dataUsers } = useStore();
-  // lấy dữ liệu
-  useEffect(() => {
-    
-    const fetchData = async () => {
-      const data = await getItemExam();
 
-      const examData = data?.data.map((exam: any) => {
+  const fetchData = useCallback(async () => {
+    const data = await getItemExam(
+      dataUsers.information_teacher.mgv,
+      searchTerm
+    );
+
+    const examData =
+      data?.data?.map((exam: any) => {
         const now = new Date();
         const examDate = new Date(exam.exam_day);
         const closeDate = new Date(exam.day_close);
@@ -50,45 +49,23 @@ export default function ExamPage() {
           status = "open";
         }
 
+        return {
+          ...exam,
+          status_exam: status,
+        };
+      }) || [];
 
+    setExams(examData);
+  }, [reload, dataUsers, searchTerm]);
+  // lấy dữ liệu
 
-        // Nếu là giảng viên, chỉ lấy bài thi của giảng viên đó
-        if (dataUsers.role_user === "lecturer" && exam.lecturer === dataUsers.username) {
-          return {
-            ...exam,
-            status_exam: status,
-          };
-        }
-
-
-        // Nếu không phải giảng viên hoặc không phải bài thi của giảng viên đó
-        return null;
-      }).filter(Boolean) || [];
-
-      setExams(examData);
-    };
-    fetchData();
-  }, [reload, dataUsers]);
-
-  const filteredExams =
-    exams?.filter((exam) =>
-      Object.values(exam).some((value) =>
-        value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    ) || [];
-
-  const columns = [
-    { name: "STT", uid: "documentId" },
-    { name: "MÔN HỌC", uid: "subject" },
-    { name: "GIẢNG VIÊN", uid: "lecturer" },
-    { name: "LỚP", uid: "class" },
-    { name: "NGÀY THI", uid: "exam_day" },
-    { name: "NGÀY ĐÓNG", uid: "day_close" },
-    { name: "THỜI LƯỢNG", uid: "duration" },
-    { name: "ĐIỂM", uid: "point" },
-    { name: "TRẠNG THÁI", uid: "status_exam" },
-    { name: "HÀNH ĐỘNG", uid: "actions" },
-  ];
+  // delay 1s để lấy dữ liệu
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchData();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [fetchData]);
 
   const getStatusColor = (status: any) => {
     switch (status) {
@@ -103,8 +80,6 @@ export default function ExamPage() {
     }
   };
 
-
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("vi-VN", {
@@ -113,7 +88,7 @@ export default function ExamPage() {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      hour12: false // Chuyển về định dạng 24 giờ
+      hour12: false, // Chuyển về định dạng 24 giờ
     });
   };
 
@@ -121,11 +96,10 @@ export default function ExamPage() {
     return `${seconds} phút`;
   };
 
-
   const handleDeleteExam = (id: any) => {
     if (!confirm("Bạn có chắc chắn muốn xóa bài thi này không?")) return;
     deleteExam(id);
-    setReload(prev => !prev);
+    setReload((prev) => !prev);
   };
 
   const handleEditExam = async (id: any) => {
@@ -186,71 +160,134 @@ export default function ExamPage() {
             }}
             shadow="none"
           >
-            <TableHeader columns={columns}>
+            <TableHeader
+              columns={[
+                { name: "STT", uid: "documentId" },
+                { name: "MÔN HỌC", uid: "subject" },
+                { name: "GIẢNG VIÊN", uid: "lecturer" },
+                { name: "LỚP", uid: "class" },
+                { name: "NGÀY THI", uid: "exam_day" },
+                { name: "NGÀY ĐÓNG", uid: "day_close" },
+                { name: "THỜI LƯỢNG", uid: "duration" },
+                { name: "ĐIỂM", uid: "point" },
+                { name: "TRẠNG THÁI", uid: "status_exam" },
+                { name: "HÀNH ĐỘNG", uid: "actions" },
+              ]}
+            >
               {(column) => (
-                <TableColumn key={column.uid} className="text-xs uppercase">
+                <TableColumn
+                  key={column.uid}
+                  className="text-xs text-center uppercase"
+                >
                   {column.name}
                 </TableColumn>
               )}
             </TableHeader>
-            <TableBody items={filteredExams}>
-              {(item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer hover:bg-gray-50/50"
-                >
-                  <TableCell>
-                    <div className="font-medium">{++count}</div>
+
+            <TableBody items={exams}>
+              {exams.length === 0 ? (
+                <TableRow>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{item.subject}</div>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{item.lecturer}</TableCell>
-                  <TableCell>
-                    <Chip size="sm" variant="flat">
-                      {item.class}
-                    </Chip>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{formatDate(item.exam_day)}</TableCell>
-                  <TableCell>{formatDate(item.day_close)}</TableCell>
-                  <TableCell>
-                    <Chip size="sm" variant="dot">
-                      {formatDuration(item.duration)}
-                    </Chip>
+
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{item.point}</TableCell>
-                  <TableCell>
-                    <Chip
-                      color={getStatusColor(item.status_exam)}
-                      variant="flat"
-                      size="sm"
-                    >
-                      {item.status_exam === "open"
-                        ? "Đang mở"
-                        : item.status_exam === "upcoming"
-                        ? "Sắp diễn ra"
-                        : "Đã đóng"}
-                    </Chip>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell className="flex items-center gap-2">
-                    <Button
-                      variant="flat"
-                      size="sm"
-                      className="bg-red-500 text-white"
-                      onClick={() => handleDeleteExam(item.id)}
-                    >
-                      Xóa
-                    </Button>
-                    <Button
-                      variant="flat"
-                      size="sm"
-                      className="bg-blue-500 text-white"
-                      onClick={() => handleEditExam(item.id)}
-                    >
-                      Sửa
-                    </Button>
+                  <TableCell className="text-center">
+                    <p>Không có dữ liệu</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
                 </TableRow>
+              ) : (
+                exams.map((item) => {
+                  return (
+                    <TableRow
+                      key={item.id}
+                      className="cursor-pointer hover:bg-gray-50/50"
+                    >
+                      <TableCell className="text-center">
+                        <div className="font-medium">{++count}</div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <div className="font-medium">{item.subject}</div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.lecturer}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Chip size="sm" variant="flat">
+                          {item.class}
+                        </Chip>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {formatDate(item.exam_day)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {formatDate(item.day_close)}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Chip size="sm" variant="dot">
+                          {formatDuration(item.duration)}
+                        </Chip>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.point}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Chip
+                          color={getStatusColor(item.status_exam)}
+                          variant="flat"
+                          size="sm"
+                        >
+                          {item.status_exam === "open"
+                            ? "Đang mở"
+                            : item.status_exam === "upcoming"
+                            ? "Sắp diễn ra"
+                            : "Đã đóng"}
+                        </Chip>
+                      </TableCell>
+                      <TableCell className="flex justify-center items-center gap-2">
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          className="bg-red-500 text-white"
+                          onClick={() => handleDeleteExam(item.id)}
+                        >
+                          Xóa
+                        </Button>
+                        <Button
+                          variant="flat"
+                          size="sm"
+                          className="bg-blue-500 text-white"
+                          onClick={() => handleEditExam(item.documentId)}
+                        >
+                          Sửa
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
@@ -259,11 +296,11 @@ export default function ExamPage() {
       {/* modal add exam */}
       {isOpenModalCreate && (
         <Modal_add_exam
-        onClose={onOpenChangeCreate}
-        setReload={setReload}
-        reload={reload}
-        dataEdit={dataEdit}
-        setDataEdit={setDataEdit}
+          onClose={onOpenChangeCreate}
+          setReload={setReload}
+          reload={reload}
+          dataEdit={dataEdit}
+          setDataEdit={setDataEdit}
         />
       )}
     </div>

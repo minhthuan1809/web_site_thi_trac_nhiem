@@ -37,7 +37,14 @@ const ModalAddExam = ({
 
   const [questions, setQuestions] = useState(
     dataEdit
-      ? dataEdit.question
+      ? dataEdit.question.map((item: any) => ({
+          question: item.question,
+          answerA: item.answerA,
+          answerB: item.answerB,
+          answerC: item.answerC,
+          answerD: item.answerD,
+          results: item.results,
+        }))
       : [
           {
             question: "",
@@ -155,14 +162,14 @@ const ModalAddExam = ({
       formattedData,
       dataUsers.information_teacher.mgv
     );
-    onClose();
+    handleResetFormAndClose();
     setReload(!reload);
   };
 
   // cập nhật
   const handleUpdateExam = async (e: React.FormEvent) => {
     e.preventDefault();
-    setDataEdit(null);
+    console.log("formData", formData);
 
     if (!validateForm()) {
       return;
@@ -179,10 +186,27 @@ const ModalAddExam = ({
       questions,
       dataUsers.information_teacher.mgv
     );
+
     if (data.ok) {
-      onClose();
+      handleResetFormAndClose();
       setReload(!reload);
     }
+  };
+  // đặt lại form và đóng modal
+  const handleResetFormAndClose = () => {
+    setFormData({
+      class: "",
+      lecturer: dataUsers?.username || "",
+      subject: "",
+      exam_day: "",
+      day_close: "",
+
+      point: "10",
+      duration: "30",
+      see_exam_results: true,
+      status_exam: false,
+    });
+    onClose();
   };
 
   return (
@@ -191,7 +215,7 @@ const ModalAddExam = ({
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-800">Thêm bài thi mới</h2>
           <button
-            onClick={onClose}
+            onClick={handleResetFormAndClose}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <X className="w-6 h-6" />
@@ -365,17 +389,17 @@ const ModalAddExam = ({
                         <label className="block text-sm font-semibold text-gray-700">
                           Câu hỏi {index + 1}
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           value={question.question}
                           onChange={(e) =>
                             handleQuestionChange(
                               index,
+
                               "question",
                               e.target.value
                             )
                           }
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                          className="w-full h-[150px] p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                           placeholder="Nhập câu hỏi"
                         />
                       </div>
@@ -462,8 +486,7 @@ const ModalAddExam = ({
                         <label className="block text-sm font-semibold text-gray-700">
                           Đáp án đúng
                         </label>
-                        <input
-                          type="text"
+                        <select
                           value={question.results}
                           onChange={(e) =>
                             handleQuestionChange(
@@ -473,8 +496,13 @@ const ModalAddExam = ({
                             )
                           }
                           className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                          placeholder="Nhập đáp án đúng (A, B, C hoặc D)"
-                        />
+                        >
+                          <option>Chọn đáp án đúng</option>
+                          <option value="A">A</option>
+                          <option value="B">B</option>
+                          <option value="C">C</option>
+                          <option value="D">D</option>
+                        </select>
                       </div>
                     </div>
                   </div>
@@ -487,7 +515,7 @@ const ModalAddExam = ({
         <div className="border-t p-6 flex justify-end gap-3 bg-gray-50">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleResetFormAndClose}
             className="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
           >
             Hủy

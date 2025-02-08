@@ -7,10 +7,12 @@ export default function NextPagination({
   total,
   setPage,
   page,
+  url,
 }: {
   total: number;
   setPage: (page: number) => void;
   page: number;
+  url: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,7 +28,7 @@ export default function NextPagination({
           total={total}
           onChange={(page) => {
             setPage(Number(searchTerm) || page);
-            router.push(`/practice?page=${page}`);
+            router.push(`${url}?page=${page}`);
           }}
         />
       </div>

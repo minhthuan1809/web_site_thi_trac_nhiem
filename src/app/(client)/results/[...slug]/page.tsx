@@ -17,6 +17,7 @@ import { getDetailExam } from "@/app/service/examquestion";
 import { useStore } from "@/app/store";
 import Error from "@/app/_components/ui/Error";
 import { getPracticeDetail } from "@/app/service/practice_api";
+import { toast } from "react-toastify";
 
 export default function ExamResults() {
   const params = useParams();
@@ -27,9 +28,9 @@ export default function ExamResults() {
   const selectedAnswers = JSON.parse(
     sessionStorage.getItem("selectedAnswers") || "{}"
   );
-  const [isPractice, setIsPractice] = useState(false);
   const router = useRouter();
   const [isError, setIsError] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       if (!selectedAnswers || Object.keys(selectedAnswers).length === 0) {
@@ -43,20 +44,23 @@ export default function ExamResults() {
         setIsError(true);
         return;
       }
-      const dataPractice = await getPracticeDetail(id);
 
-      if (!dataPractice.data) {
+      if (params.slug?.[0] === "practice") {
+        const dataPractice = await getPracticeDetail(id);
+        if (!dataPractice.data) {
+          setIsError(true);
+          return;
+        }
+        setData(dataPractice.data);
+        calculateResults(dataPractice.data);
+      } else if (params.slug?.[0] === "exam") {
         const dataExam = await getDetailExam(id);
         setData(dataExam.data);
         calculateResults(dataExam.data);
-        setIsPractice(false);
       } else {
-        setData(dataPractice.data);
-        setIsPractice(true);
-        calculateResults(dataPractice.data);
+        return <Error />;
       }
     };
-
     fetchData();
   }, [dataUsers, params.slug]);
 
@@ -77,17 +81,20 @@ export default function ExamResults() {
 
   // xử lý xem đáp án
   const handleSeeExamResults = () => {
-    if (isPractice) {
+    if (params.slug?.[0] === "practice") {
       router.push(
-        `/detail_results_question/practice/${params.slug?.[1]}/${params.slug?.[2]}`
+        `/detail_results_question/${params.slug?.[0]}/${params.slug?.[1]}/${params.slug?.[2]}`
       );
-    } else {
+    } else if (params.slug?.[0] === "exam") {
       router.push(
-        `/detail_results_question/exam/${params.slug?.[1]}/${params.slug?.[2]}`
+        `/detail_results_question/${params.slug?.[0]}/${params.slug?.[1]}/${params.slug?.[2]}`
       );
     }
   };
+
+  // xử lý lỗi
   if (isError || params.slug?.length !== 3) return <Error />;
+
   return (
     <div className="min-h-screen pt-[13rem] bg-gray-50 py-12">
       <div className="max-w-3xl mx-auto px-4">
@@ -173,7 +180,7 @@ export default function ExamResults() {
 
             {/* Actions Section */}
             <div className="mt-6 flex justify-center gap-4">
-              {(isPractice || data?.see_exam_results) && (
+              {(params.slug?.[0] === "practice" || data?.see_exam_results) && (
                 <Button
                   color="primary"
                   size="lg"

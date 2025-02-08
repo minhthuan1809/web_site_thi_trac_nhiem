@@ -13,7 +13,7 @@ import {
 } from "@/app/service/Navbar_api";
 import { deleteCookie, getCookie } from "cookies-next";
 import { toast } from "react-toastify";
-import { useStore } from "@/app/store";
+import { refreshStore, useStore } from "@/app/store";
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -22,14 +22,22 @@ export default function NavBar() {
   const [btnNav, setBtnNav] = useState<any[]>([]);
   const router = useRouter();
   const { dataUsers, setDataUsers } = useStore();
+  const { dataRefresh } = refreshStore();
 
+  const fetchData = async () => {
+    const data = await getLogo();
+    const dataNavItems = await getNavItems();
+    const dataNavBtn = await getNavBtn();
+    setLogo(data.data.navbar.logo.url);
+    setItems(dataNavItems.data.navbar.items);
+    setBtnNav(dataNavBtn.data.navbar.btn_nav);
+  };
+
+  // thực hiện khi có sự thay đổi trong dataRefresh
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getLogo();
-      const dataNavItems = await getNavItems();
-      const dataNavBtn = await getNavBtn();
+    fetchData();
+    const fetchDataUser = async () => {
       const dataUserInfo = await getUserInfo();
-
       if (dataUserInfo.error) {
         // kiểm tra tk bị khóa
         toast.dismiss();
@@ -37,16 +45,13 @@ export default function NavBar() {
         deleteCookie("jwt");
         toast.info("bạn cần đăng nhập lại !");
       }
-
-      setLogo(data.data.navbar.logo.url);
-      setItems(dataNavItems.data.navbar.items);
-      setBtnNav(dataNavBtn.data.navbar.btn_nav);
-
       // thêm dữ liệu vào store
       setDataUsers(dataUserInfo);
     };
-    fetchData();
-  }, []);
+    if (getCookie("jwt")) {
+      fetchDataUser();
+    }
+  }, [dataRefresh]);
 
   const handleLogout = () => {
     if (confirm("Bạn có chắc chắn muốn đăng xuất không?")) {
