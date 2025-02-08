@@ -143,20 +143,32 @@ export default function NavBar() {
                   {/* /// hiện thị mục dành cho giáo viên */}
                   {dataUsers?.role_user === "lecturer" && (
                     <>
-                      <Link
-                        href="/add_exam"
-                        className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
-                      >
-                        <Icon icon="BookOpenCheck" className="w-5 h-5" />
-                        <span className="font-medium">Thêm bài thi</span>
-                      </Link>
-                      <Link
-                        href="/history_exam"
-                        className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
-                      >
-                        <Icon icon="FileClock" className="w-5 h-5" />
-                        <span className="font-medium">lịch sử bài thi</span>
-                      </Link>
+                      {[
+                        {
+                          href: "/add_practice",
+                          icon: "CirclePlus",
+                          content: "Thêm bài thi thử",
+                        },
+                        {
+                          href: "/add_exam",
+                          icon: "BookOpenCheck",
+                          content: "Thêm bài thi",
+                        },
+                        {
+                          href: "/history_exam",
+                          icon: "FileClock",
+                          content: "Lịch sử bài thi",
+                        },
+                      ].map((item, index) => (
+                        <Link
+                          key={index}
+                          href={item.href}
+                          className="flex items-center gap-2 px-4 py-2 text-gray-800 hover:bg-blue-50"
+                        >
+                          <Icon icon={item.icon} className="w-5 h-5" />
+                          <span className="font-medium">{item.content}</span>
+                        </Link>
+                      ))}
                     </>
                   )}
 

@@ -14,7 +14,7 @@ import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { SearchIcon } from "@nextui-org/shared-icons";
 import { getItemExam } from "@/app/service/exams_api";
-import Modal_add_exam from "./Modal_add_exam";
+import Modal_add_exam from "./modal_exam/Modal_add_exam";
 import { deleteExam, getDetailExam } from "@/app/service/examquestion";
 import { useStore } from "@/app/store";
 
@@ -24,9 +24,9 @@ export default function ExamPage() {
   const [searchTerm, setSearchTerm] = useState("");
   let count = 0;
   const [isOpenModalCreate, setIsOpenModalCreate] = useState(false);
-  const onOpenChangeCreate = () => setIsOpenModalCreate(!isOpenModalCreate);
   const [reload, setReload] = useState(false);
   const [dataEdit, setDataEdit] = useState<any>(null);
+  const onOpenChangeCreate = () => setIsOpenModalCreate(!isOpenModalCreate);
 
   const { dataUsers } = useStore();
 
@@ -297,7 +297,10 @@ export default function ExamPage() {
       {/* modal add exam */}
       {isOpenModalCreate && (
         <Modal_add_exam
-          onClose={onOpenChangeCreate}
+          onClose={() => {
+            onOpenChangeCreate();
+            setDataEdit(null);
+          }}
           setReload={setReload}
           reload={reload}
           dataEdit={dataEdit}

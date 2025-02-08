@@ -88,8 +88,6 @@ export const updateExam = async (
   question: any,
   magv: any
 ) => {
-  console.log("question", question);
-
   toast.dismiss();
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/exams/${id}`,
