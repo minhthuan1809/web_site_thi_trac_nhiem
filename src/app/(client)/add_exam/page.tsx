@@ -33,7 +33,8 @@ export default function ExamPage() {
   const fetchData = useCallback(async () => {
     const data = await getItemExam(
       dataUsers.information_teacher.mgv,
-      searchTerm
+      searchTerm,
+      null // giá trị sinh viên là null
     );
 
     const examData =
@@ -237,7 +238,7 @@ export default function ExamPage() {
                       </TableCell>
                       <TableCell className="text-center">
                         <Chip size="sm" variant="flat">
-                          {item.class}
+                          {item.class.trim().toUpperCase()}
                         </Chip>
                       </TableCell>
                       <TableCell className="text-center">

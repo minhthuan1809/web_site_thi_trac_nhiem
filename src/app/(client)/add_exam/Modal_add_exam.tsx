@@ -169,7 +169,6 @@ const ModalAddExam = ({
   // cập nhật
   const handleUpdateExam = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("formData", formData);
 
     if (!validateForm()) {
       return;

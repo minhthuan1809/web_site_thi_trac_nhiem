@@ -27,36 +27,29 @@ export default function ExamPage() {
   useEffect(() => {
     sessionStorage.removeItem("selectedAnswers");
     sessionStorage.removeItem("time_exam");
+
     const fetchData = async () => {
-      const data = await getItemExam();
+      const data = await getItemExam(
+        null,
+        "",
+        dataUsers.information_user.class.trim().toUpperCase()
+      );
 
-      const examData =
-        data?.data
-          .map((exam: any) => {
-            const now = new Date();
-            const examDate = new Date(exam.exam_day);
-            const closeDate = new Date(exam.day_close);
-            let status = "closed";
-            if (now < examDate) {
-              status = "upcoming";
-            } else if (now >= examDate && now <= closeDate) {
-              status = "open";
-            }
-            // Nếu là sinh viên, chỉ lấy bài thi của lớp đó
-            if (
-              dataUsers.role_user === "students" &&
-              exam.class.trim().toLowerCase() ===
-                dataUsers.information_user.class.trim().toLowerCase()
-            ) {
-              return {
-                ...exam,
-                status_exam: status,
-              };
-            }
-
-            return null;
-          })
-          .filter(Boolean) || [];
+      const examData = data?.data.map((exam: any) => {
+        const now = new Date();
+        const examDate = new Date(exam.exam_day);
+        const closeDate = new Date(exam.day_close);
+        let status = "closed";
+        if (now < examDate) {
+          status = "upcoming";
+        } else if (now >= examDate && now <= closeDate) {
+          status = "open";
+        }
+        return {
+          ...exam,
+          status_exam: status,
+        };
+      });
 
       setExams(examData);
     };
@@ -175,68 +168,104 @@ export default function ExamPage() {
               )}
             </TableHeader>
             <TableBody items={filteredExams}>
-              {(item) => (
-                <TableRow
-                  key={item.id}
-                  className="cursor-pointer hover:bg-gray-50/50"
-                >
-                  <TableCell>
-                    <div className="font-medium">{++count}</div>
+              {filteredExams.length === 0 ? (
+                <TableRow>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{item.subject}</div>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{item.lecturer}</TableCell>
-                  <TableCell>
-                    <Chip size="sm" variant="flat">
-                      {item.class}
-                    </Chip>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{formatDate(item.exam_day)}</TableCell>
-                  <TableCell>{formatDate(item.day_close)}</TableCell>
-                  <TableCell>
-                    <Chip size="sm" variant="dot">
-                      {formatDuration(item.duration)}
-                    </Chip>
+
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>{item.point}</TableCell>
-                  <TableCell>
-                    <Chip
-                      color={getStatusColor(item.status_exam)}
-                      variant="flat"
-                      size="sm"
-                    >
-                      {item.status_exam === "open"
-                        ? "Đang mở"
-                        : item.status_exam === "upcoming"
-                        ? "Sắp diễn ra"
-                        : "Đã đóng"}
-                    </Chip>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
-                  <TableCell>
-                    <Tooltip
-                      content={
-                        item.status_exam === "open"
-                          ? "Bắt đầu làm bài"
-                          : "Bài thi chưa được mở"
-                      }
-                    >
-                      <Button
-                        color={
-                          item.status_exam === "open" ? "primary" : "default"
-                        }
-                        variant="flat"
-                        size="sm"
-                        onClick={() =>
-                          handleStartExam(item.documentId, item.subject)
-                        }
-                        disabled={item.status_exam !== "open"}
-                      >
-                        {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}
-                      </Button>
-                    </Tooltip>
+                  <TableCell className="text-center">
+                    <p>Không có dữ liệu</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <p>-</p>
                   </TableCell>
                 </TableRow>
+              ) : (
+                (item) => (
+                  <TableRow
+                    key={item.id}
+                    className="cursor-pointer hover:bg-gray-50/50"
+                  >
+                    <TableCell>
+                      <div className="font-medium">{++count}</div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">{item.subject}</div>
+                    </TableCell>
+                    <TableCell>{item.lecturer}</TableCell>
+                    <TableCell>
+                      <Chip size="sm" variant="flat">
+                        {item.class.trim().toUpperCase()}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>{formatDate(item.exam_day)}</TableCell>
+                    <TableCell>{formatDate(item.day_close)}</TableCell>
+                    <TableCell>
+                      <Chip size="sm" variant="dot">
+                        {formatDuration(item.duration)}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>{item.point}</TableCell>
+                    <TableCell>
+                      <Chip
+                        color={getStatusColor(item.status_exam)}
+                        variant="flat"
+                        size="sm"
+                      >
+                        {item.status_exam === "open"
+                          ? "Đang mở"
+                          : item.status_exam === "upcoming"
+                          ? "Sắp diễn ra"
+                          : "Đã đóng"}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>
+                      <Tooltip
+                        content={
+                          item.status_exam === "open"
+                            ? "Bắt đầu làm bài"
+                            : "Bài thi chưa được mở"
+                        }
+                      >
+                        <Button
+                          color={
+                            item.status_exam === "open" ? "primary" : "default"
+                          }
+                          variant="flat"
+                          size="sm"
+                          onClick={() =>
+                            handleStartExam(item.documentId, item.subject)
+                          }
+                          disabled={item.status_exam !== "open"}
+                        >
+                          {item.status_exam === "open" ? "Làm bài" : "Chưa mở"}
+                        </Button>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                )
               )}
             </TableBody>
           </Table>
