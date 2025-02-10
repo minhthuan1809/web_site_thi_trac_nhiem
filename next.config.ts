@@ -17,12 +17,12 @@ const nextConfig: NextConfig = {
         hostname: "louisville.edu",
       },
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "1337",
+        protocol: "https",
+        hostname: "backend-strapi-thi-trac-nhiem.onrender.com",
       },
     ],
   },
+
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
