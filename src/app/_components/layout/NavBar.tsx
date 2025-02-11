@@ -67,22 +67,24 @@ export default function NavBar() {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex w-[95%] mx-auto justify-around items-center h-20">
             <div className="w-40 overflow-hidden h-[60%] rounded-md">
-              <Link
-                href="/"
-                className="w-full h-full"
-                onClick={() => {
-                  sessionStorage.removeItem("selectedAnswers");
-                }}
-              >
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
-                  alt="logo"
-                  width={150}
-                  height={150}
+              {logo && (
+                <Link
+                  href="/"
                   className="w-full h-full"
-                  priority
-                />
-              </Link>
+                  onClick={() => {
+                    sessionStorage.removeItem("selectedAnswers");
+                  }}
+                >
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
+                    alt="logo"
+                    width={150}
+                    height={150}
+                    className="w-full h-full"
+                    priority
+                  />
+                </Link>
+              )}
             </div>
             <div className="flex gap-8">
               {items.map((item, index) => (
@@ -197,16 +199,18 @@ export default function NavBar() {
           {/* Mobile Navigation */}
           <div className="lg:hidden flex justify-between items-center h-20">
             <div className="w-32 overflow-hidden h-[60%] rounded-md">
-              <Link href="/" className="w-full h-full">
-                <Image
-                  src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
-                  alt="logo"
-                  width={150}
-                  height={150}
-                  className="w-full h-full"
-                  priority
-                />
-              </Link>
+              {logo && (
+                <Link href="/" className="w-full h-full">
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_API_URL}${logo}`}
+                    alt="logo"
+                    width={150}
+                    height={150}
+                    className="w-full h-full"
+                    priority
+                  />
+                </Link>
+              )}
             </div>
 
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">

@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "backend-strapi-thi-trac-nhiem.onrender.com",
       },
+      {
+        protocol: "https",
+        hostname: "localhost",
+        port: "1337",
+      },
     ],
   },
 

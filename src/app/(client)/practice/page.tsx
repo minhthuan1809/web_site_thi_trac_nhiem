@@ -6,10 +6,21 @@ import {
   Card,
   CardBody,
   CardFooter,
+  CardHeader,
   Button,
   Chip,
+  Divider,
+  Avatar,
+  Tooltip,
 } from "@nextui-org/react";
-import { SearchIcon, BookOpenIcon } from "lucide-react";
+import {
+  SearchIcon,
+  BookOpenIcon,
+  ClockIcon,
+  StarIcon,
+  UserIcon,
+  CalendarIcon,
+} from "lucide-react";
 import { getPracticePage } from "@/app/service/practice_api";
 import NextPagination from "@/app/_components/ui/Pagination";
 
@@ -20,6 +31,9 @@ interface Subject {
   point: number;
   documentId: string;
   status_exam: boolean;
+  lecturer: string;
+  createdAt: string;
+  question: any[];
 }
 
 export default function PracticePage() {
@@ -45,18 +59,25 @@ export default function PracticePage() {
     const fetchData = async () => {
       try {
         const response = await getPracticePage(page, searchTerm);
-
         setPracticePage(response.data);
         setTotalPages(response.meta.pagination.pageCount);
       } catch (error) {
         console.error("Error fetching practice page:", error);
-      } finally {
       }
     };
     fetchData();
   }, [page, searchTerm]);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br pt-[10rem] from-blue-50 to-white py-16">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-16 pt-[10rem]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-violet-600 mb-4">
@@ -85,44 +106,79 @@ export default function PracticePage() {
         </div>
 
         {practicePage.length === 0 ? (
-          <div className="text-center text-gray-500">không có dữ liệu</div>
+          <div className="text-center text-gray-500">Không có dữ liệu</div>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {practicePage.map((subject, index) => {
-                if (subject.status_exam) return;
+                if (subject.status_exam) return null;
                 return (
                   <Card
                     key={index}
                     isPressable
                     className="border-none shadow-md hover:shadow-xl transition-shadow"
                   >
-                    <CardBody className="p-6">
-                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-primary">
-                          {subject.subject}
-                        </h2>
-                        <BookOpenIcon className="text-default-400" />
+                    <CardHeader className="flex gap-3">
+                      <Avatar
+                        icon={<BookOpenIcon />}
+                        classNames={{
+                          base: "bg-gradient-to-br from-blue-500 to-violet-500",
+                          icon: "text-white",
+                        }}
+                      />
+                      <div className="flex flex-col">
+                        <p className="text-lg font-bold">{subject.subject}</p>
+                        <p className="text-small text-default-500">
+                          {subject.question.length} câu hỏi
+                        </p>
                       </div>
-                      <div className="space-y-2">
-                        <Chip color="primary" variant="light" size="sm">
-                          Thời gian: {subject.duration} phút
-                        </Chip>
-                        <Chip color="secondary" variant="light" size="sm">
-                          Điểm tối đa: {subject.point} điểm
-                        </Chip>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody className="py-4">
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Tooltip content="Thời gian làm bài">
+                            <Chip
+                              startContent={<ClockIcon className="w-4 h-4" />}
+                              variant="flat"
+                              color="primary"
+                              size="sm"
+                            >
+                              {subject.duration} phút
+                            </Chip>
+                          </Tooltip>
+                          <Tooltip content="Điểm tối đa">
+                            <Chip
+                              startContent={<StarIcon className="w-4 h-4" />}
+                              variant="flat"
+                              color="warning"
+                              size="sm"
+                            >
+                              {subject.point} điểm
+                            </Chip>
+                          </Tooltip>
+                        </div>
+                        <div className="flex items-center gap-2 text-small text-default-500">
+                          <UserIcon className="w-4 h-4" />
+                          {subject.lecturer}
+                        </div>
+                        <div className="flex items-center gap-2 text-small text-default-500">
+                          <CalendarIcon className="w-4 h-4" />
+                          {formatDate(subject.createdAt)}
+                        </div>
                       </div>
                     </CardBody>
+                    <Divider />
                     <CardFooter>
                       <Button
                         fullWidth
                         color="primary"
-                        variant="solid"
+                        variant="shadow"
                         onPress={() =>
                           handleClick(subject, subject?.documentId)
                         }
                       >
-                        Làm thử
+                        Bắt đầu làm bài
                       </Button>
                     </CardFooter>
                   </Card>

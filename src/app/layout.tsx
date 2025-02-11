@@ -18,8 +18,8 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          {children}
           <ToastContainer position="top-center" autoClose={1000} />
+          {children}
         </Providers>
       </body>
     </html>

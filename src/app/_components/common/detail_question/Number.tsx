@@ -93,15 +93,15 @@ export default function Number({
         {data.map((item: any, index: number) => (
           <button
             key={index + 1}
-            className={`flex items-center justify-center w-10 h-10 rounded-full
+            className={`flex items-center justify-center w-9 h-9 text-md rounded-full transition-colors
               ${
-                index + 1 === question // số câu hỏi đang chọn
-                  ? "bg-blue-600 text-white"
-                  : Object.keys(answered).includes(item.id.toString()) // câu hỏi đã trả lời
-                  ? "bg-gray-400 text-white"
-                  : "bg-gray-200"
+                index + 1 === question
+                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                  : Object.keys(answered).includes(item.id.toString())
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-gray-200 hover:bg-gray-300"
               }
-              `}
+            `}
             onClick={() => setQuestion(index + 1)}
           >
             {index + 1}

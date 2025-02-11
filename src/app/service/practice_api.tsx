@@ -1,7 +1,7 @@
 // get practice page
 export const getPracticePage = async (page: number, searchTerm: string) => {
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/practices?pagination[page]=${page}&pagination[pageSize]=16&filters[subject][$containsi]=${searchTerm}&populate=*`
+    `${process.env.NEXT_PUBLIC_API_URL}/api/practices?pagination[page]=${page}&pagination[pageSize]=15&filters[subject][$containsi]=${searchTerm}&populate=*`
   );
   const data = await response.json();
 
