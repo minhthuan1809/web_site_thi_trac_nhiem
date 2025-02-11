@@ -157,7 +157,7 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
                     ))}
                   </RadioGroup>
 
-                  <div className="flex justify-between mt-10">
+                  <div className="flex justify-between mt-10  ">
                     <Button
                       variant="bordered"
                       color="primary"
@@ -165,7 +165,11 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
                         setNumberQuestion(Math.max(1, numberQuestion - 1))
                       }
                       isDisabled={numberQuestion === 1}
-                      className="min-w-[140px] h-12 text-lg"
+                      className={`min-w-[140px] h-12 text-lg ${
+                        numberQuestion === 1
+                          ? "invisible"
+                          : "bg-primary text-white cursor-pointer bg-gray-500 border-gray-500"
+                      }`}
                     >
                       Câu trước
                     </Button>
@@ -177,7 +181,11 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
                         )
                       }
                       isDisabled={numberQuestion === questions.length}
-                      className="min-w-[140px] h-12 text-lg"
+                      className={`min-w-[140px] h-12 text-lg ${
+                        numberQuestion === questions.length
+                          ? "invisible"
+                          : "bg-primary text-white cursor-pointer"
+                      }`}
                     >
                       Câu tiếp theo
                     </Button>
