@@ -151,7 +151,7 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
                           base: "max-w-full p-4 hover:bg-gray-50 transition-all duration-150 rounded-xl",
                           wrapper: "group-data-[selected=true]:border-primary",
                           label: "text-gray-700 font-medium text-lg",
-                          description: "text-gray-600 mt-1 text-md",
+                          description: "text-gray-800 mt-1 text-md",
                         }}
                       ></Radio>
                     ))}

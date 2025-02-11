@@ -98,7 +98,7 @@ export default function Number({
                 index + 1 === question
                   ? "bg-blue-600 text-white hover:bg-blue-700"
                   : Object.keys(answered).includes(item.id.toString())
-                  ? "bg-green-500 text-white hover:bg-green-600"
+                  ? "bg-gray-400 text-white hover:bg-gray-600"
                   : "bg-gray-200 hover:bg-gray-300"
               }
             `}
