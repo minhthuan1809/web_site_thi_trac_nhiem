@@ -44,12 +44,8 @@ export default function Time({
 
   return (
     <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4 rounded-lg shadow-lg mb-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Clock className="w-6 h-6 text-white" />
-          <span className="text-white font-medium">Thời gian còn lại:</span>
-        </div>
-        <div className="bg-white px-4 py-2 rounded-full">
+      <div className="flex items-center justify-center">
+        <div className="bg-white px-14 py-2 rounded-full">
           <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
             {formatTime(_time)}
           </span>
