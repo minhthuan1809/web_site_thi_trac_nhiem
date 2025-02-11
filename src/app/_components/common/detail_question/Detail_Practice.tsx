@@ -193,7 +193,7 @@ const Detail_Practice: React.FC<DetailPracticeProps> = ({ data, runtime }) => {
                   <CardBody className="p-6">
                     <div className="mb-4">
                       <h3 className="text-xl font-semibold text-gray-800">
-                        Thời gian còn lại
+                        Thời gian còn lại :
                       </h3>
                     </div>
                     <Time _setTime={_setTime} _time={_time} />
