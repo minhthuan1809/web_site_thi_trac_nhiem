@@ -13,8 +13,11 @@ import { refreshStore } from "@/app/store";
 
 // vần xử lý code
 export default function PageLogin() {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState<any>(getCookie("rememberMe") || "");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(
+    getCookie("rememberMe") ? true : false
+  );
   const router = useRouter();
   const { setRefresh } = refreshStore();
 
@@ -32,6 +35,12 @@ export default function PageLogin() {
   const handleLogin = async (e: any) => {
     e.preventDefault();
     toast.dismiss();
+
+    if (password === "" || email === "") {
+      toast.error("Vui lòng nhập đủ thông tin");
+      return;
+    }
+
     const data = await requestLogin(email, password);
 
     if (data.error) {
@@ -54,7 +63,7 @@ export default function PageLogin() {
     }
     if (data.jwt) {
       setCookie("jwt", data.jwt, {
-        maxAge: 60 * 60 * 24, // 1 ngày
+        maxAge: rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24, // 30 ngày nếu remember me, 1 ngày nếu không
         path: "/",
       });
       router.push("/");
@@ -64,6 +73,18 @@ export default function PageLogin() {
       toast.error("Đăng nhập thất bại");
     }
   };
+
+  // hàm ghi nhớ đăng nhập
+  useEffect(() => {
+    console.log(rememberMe);
+
+    if (rememberMe) {
+      setCookie("rememberMe", email);
+    } else {
+      deleteCookie("rememberMe");
+    }
+  }, [rememberMe]);
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
@@ -109,22 +130,17 @@ export default function PageLogin() {
                 <input
                   id="remember-me"
                   type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
                 />
                 <label
                   htmlFor="remember-me"
                   className="ml-2 block text-sm text-gray-600 cursor-pointer hover:text-gray-900 transition-colors"
                 >
-                  Ghi nhớ đăng nhập
+                  Ghi nhớ tài khoản
                 </label>
               </div>
-
-              <Link
-                href="/forgot-password"
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors hover:underline"
-              >
-                Quên mật khẩu?
-              </Link>
             </div>
 
             <div className="space-y-4">

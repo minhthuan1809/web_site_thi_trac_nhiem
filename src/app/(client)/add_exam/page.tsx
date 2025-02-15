@@ -32,7 +32,7 @@ export default function ExamPage() {
 
   const fetchData = useCallback(async () => {
     const data = await getItemExam(
-      dataUsers.information_teacher.mgv,
+      dataUsers.information_teacher?.mgv,
       searchTerm,
       null // giá trị sinh viên là null
     );
