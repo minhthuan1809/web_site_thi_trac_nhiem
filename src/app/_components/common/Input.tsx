@@ -10,6 +10,7 @@ interface InputProps {
   onChange: (value: string) => void;
   type?: string;
   icon?: string;
+  error?: string;
 }
 
 export default function Input({

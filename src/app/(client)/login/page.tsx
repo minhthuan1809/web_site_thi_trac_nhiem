@@ -40,6 +40,14 @@ export default function PageLogin() {
       toast.error("Vui lòng nhập đủ thông tin");
       return;
     }
+    if (password.length < 6 || password.length > 20) {
+      toast.error("Mật khẩu phải có ít nhất 6 ký tự và không quá 20 ký tự");
+      return;
+    }
+    if (!email.includes("@")) {
+      toast.error("Email không hợp lệ");
+      return;
+    }
 
     const data = await requestLogin(email, password);
 
