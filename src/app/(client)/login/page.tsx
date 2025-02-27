@@ -44,7 +44,7 @@ export default function PageLogin() {
       toast.error("Mật khẩu phải có ít nhất 6 ký tự và không quá 20 ký tự");
       return;
     }
-    if (!email.includes("@")) {
+    if (!email.includes("@eaut.edu.vn")) {
       toast.error("Email không hợp lệ");
       return;
     }
