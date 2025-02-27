@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "backend-strapi-thi-trac-nhiem.onrender.com",
+        hostname: "backend-strapi-thi-trac-nhiem-7w7u.onrender.com",
       },
       {
         protocol: "https",
